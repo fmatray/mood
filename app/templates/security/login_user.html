@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% include "security/_messages.html" %}
+
+	<div class="container">
+	{{ super() }}
+		<div class="col-md-12">
+			{{ wtf.quick_form(login_user_form) }}
+		</div>
+	</div>
+{% endblock %}
