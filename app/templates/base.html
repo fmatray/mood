@@ -1,0 +1,35 @@
+{%- extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as utils %}
+{% block title %} How do you feel today ? {% endblock %} 
+
+{% block head %}
+	{{super()}}
+	{{fixes.ie8()}}
+{%- endblock %}
+
+{% block styles -%}
+    {{super()}}  
+{% endblock %}
+
+{% block navbar %}
+	{{nav.moodnavbar.render()}}
+{% endblock %}
+
+{% block content %}
+  {%- with messages = get_flashed_messages(with_categories=True) %}
+  {%- if messages %}
+    <div class="row">
+      <div class="col-md-12">
+        {{utils.flashed_messages(messages)}}
+      </div>
+    </div>
+  {%- endif %}
+  {%- endwith %}
+  {% if title %}
+  <div class="col-md-12">
+			<h1>{{ title }}<h1>
+		</div>
+	{% endif %}
+ {% endblock %}
