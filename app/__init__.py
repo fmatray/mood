@@ -3,12 +3,12 @@ from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 
 from flask_mongoengine import MongoEngine
-from flask_mongoengine.wtf import model_form
 
 from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from flask_admin.contrib.mongoengine import ModelView
 from flask.ext.security import Security, MongoEngineUserDatastore, UserMixin, RoleMixin, login_required, current_user
+from flask.ext.login import LoginManager
 from flask_mail import Mail
 
 app=Flask(__name__)
@@ -24,7 +24,6 @@ nav.init_app(app)
 
 class SecuredModelView(ModelView):
 	def is_accessible(self):
-		return True
 		if not current_user.is_active or not current_user.is_authenticated:
 			return False
 
@@ -50,10 +49,21 @@ from .models import *
 admin.add_view(SecuredModelView(User))
 admin.add_view(SecuredModelView(Role))
 admin.add_view(SecuredModelView(Team))
+admin.add_view(SecuredModelView(MoodItem))
+admin.add_view(SecuredModelView(MoodGroup))
 
 # Setup Flask-Security
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
+
+login_manager = LoginManager()
+login_manager.login_view = "users.login"
+
+@login_manager.user_loader 
+def load_user(user_id):
+	return User.get(_id=user_id)
+
+login_manager.init_app(app)
 
 @security.context_processor
 def security_context_processor():
