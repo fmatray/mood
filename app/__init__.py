@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
-
 from flask_mongoengine import MongoEngine
 
 from flask_admin import Admin
@@ -56,14 +55,7 @@ admin.add_view(SecuredModelView(MoodGroup))
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-login_manager = LoginManager()
-login_manager.login_view = "users.login"
 
-@login_manager.user_loader 
-def load_user(user_id):
-	return User.get(_id=user_id)
-
-login_manager.init_app(app)
 
 @security.context_processor
 def security_context_processor():

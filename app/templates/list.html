@@ -1,0 +1,11 @@
+ {% extends "base.html" %}
+ {% block content %} 
+	<div class="container">
+	{{ super() }}
+		<div class="col-md-12">
+			{% for item in list %}
+				{{  item.mood }}</br>
+			{% endfor %}
+		</div>
+	</div>
+ {% endblock %}

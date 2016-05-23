@@ -27,7 +27,7 @@ class User(UserMixin, db.Document):
 	teams = db.ListField(db.ReferenceField(Team), default=[])
 
 	def __str__(self):
-		return("%s" % self.name)
+		return("%s" % self.email)
 
 class MoodItem(db.Document):
 	name=db.StringField(max_length=32)
@@ -44,7 +44,7 @@ class MoodGroup(db.Document):
 class Mood(db.Document):
 	mood=db.ListField(db.ReferenceField(MoodItem), default=[], validators=[validators.Required()])
 	date=db.DateTimeField(default=datetime.now, required=True)
-	user=db.ReferenceField(User, required=True)
+	user=db.ReferenceField(User, default=[] , required=True)
 	
 	def __str__(self):
 		return("%s" % self.mood)
