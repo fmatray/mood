@@ -1,7 +1,8 @@
 from app import db
-from flask.ext.security import UserMixin, RoleMixin
+from flask.ext.security import UserMixin, RoleMixin, current_user
 from wtforms import validators
 from datetime import datetime
+
 
 class Role(db.Document, RoleMixin):
 	name = db.StringField(max_length=80, unique=True)
@@ -10,12 +11,6 @@ class Role(db.Document, RoleMixin):
 	def __str__(self):
 		return("%s" % self.name)
 
-class Team(db.Document):
-	name = db.StringField(max_length=80, unique=True)
-	description = db.StringField(max_length=255)
-	
-	def __str__(self):
-		return("%s" % self.name)
 
 class User(UserMixin, db.Document):
 	name = db.StringField(max_length=80)
@@ -24,11 +19,23 @@ class User(UserMixin, db.Document):
 	active = db.BooleanField(default=True)
 	confirmed_at = db.DateTimeField()
 	roles = db.ListField(db.ReferenceField(Role), default=[])
-	teams = db.ListField(db.ReferenceField(Team), default=[])
 
 	def __str__(self):
-		return("%s" % self.email)
+		if (self.name):
+			return("%s" % self.name)
+		else:
+			return("%s" % self.email)
 
+class Team(db.Document):
+	name = db.StringField(max_length=80, unique=True)
+	description = db.StringField(max_length=255)
+	admin=db.ReferenceField(User, required=True)
+	date=db.DateTimeField(default=datetime.now, required=True)
+	members=db.ListField(db.ListField(db.ReferenceField(User), default=[]))
+
+	def __str__(self):
+		return("%s" % self.name)
+			
 class MoodItem(db.Document):
 	name=db.StringField(max_length=32)
 	def __str__(self):
@@ -42,9 +49,9 @@ class MoodGroup(db.Document):
 		return("%s" % self.name)
 
 class Mood(db.Document):
-	mood=db.ListField(db.ReferenceField(MoodItem), default=[], validators=[validators.Required()])
+	mood=db.ReferenceField(MoodItem, default=[], validators=[validators.Required()])
 	date=db.DateTimeField(default=datetime.now, required=True)
-	user=db.ReferenceField(User, default=[] , required=True)
+	user=db.ReferenceField(User, required=True)
 	
 	def __str__(self):
-		return("%s" % self.mood)
+		return("%s" % self.mood.name)

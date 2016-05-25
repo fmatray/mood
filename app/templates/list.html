@@ -1,11 +1,28 @@
+ {% macro renderlist(item) %}
+		<a href="{{editurl}}/{{ item['id'] }}" class="list-group-item">
+		{%if badge %}
+			<span class="badge">{{ item[badge]|length }}</span>
+		{% endif %}
+		{% for field in fields %}
+			{% if field != "id" %}
+				{{ field | capitalize }} : {{ item[field] |safe }}<br>
+			{% endif %}
+		{% endfor %}
+		
+		</a>
+{% endmacro %}
+ 
+ 
  {% extends "base.html" %}
  {% block content %} 
 	<div class="container">
 	{{ super() }}
 		<div class="col-md-12">
-			{% for item in list %}
-				{{  item.mood }}</br>
-			{% endfor %}
+				{% for item in list %}
+				<ul class="list-group">
+					{{  renderlist(item) }}
+				</ul>
+				{% endfor %}
 		</div>
 	</div>
  {% endblock %}

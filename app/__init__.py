@@ -55,8 +55,13 @@ admin.add_view(SecuredModelView(MoodGroup))
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
 
-
+@login_manager.user_loader
+def user_loader(user_id):
+	u=User.objects.get(id=user_id)
+	return u
 @security.context_processor
 def security_context_processor():
     return dict(
