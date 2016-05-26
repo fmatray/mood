@@ -81,7 +81,7 @@ def team(team_id=None):
 	else:
 		t=Team()
 	t.admin=User.objects.get(id=current_user.id)
-	Teamform=model_form(Team)
+	Teamform=model_form(Team, only=["name", "description"])
 	Teamform.submit=SubmitField('Go')
 	form=Teamform(request.form, t)
 	if  form.validate_on_submit():
@@ -95,7 +95,7 @@ def team(team_id=None):
 @login_required
 def teamlist():
 	teams=Team.objects(admin=current_user.id)
-	fields=("name", "description", "admin", "members")
+	fields=("name", "description", "admin")
 	return (render_template("list.html", list=teams, fields=fields, 
 					editurl=url_for("team"), badge="members", title="Teams"))
 

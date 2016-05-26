@@ -1,15 +1,20 @@
  {% macro renderlist(item) %}
-		<a href="{{editurl}}/{{ item['id'] }}" class="list-group-item">
+		<li class="list-group-item">
 		{%if badge %}
 			<span class="badge">{{ item[badge]|length }}</span>
 		{% endif %}
 		{% for field in fields %}
 			{% if field != "id" %}
-				{{ field | capitalize }} : {{ item[field] |safe }}<br>
+				<strong>{{ field | capitalize }}</strong> : {{ item[field] |safe }}<br>
 			{% endif %}
 		{% endfor %}
-		
-		</a>
+		<br>
+		<div class="btn-group" role="group">
+			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
+			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+		</div>
+		</li>
 {% endmacro %}
  
  
