@@ -99,7 +99,14 @@ def teamlist():
 	return (render_template("list.html", list=teams, fields=fields, 
 					editurl=url_for("team"), badge="members", title="Teams"))
 
+					
+
+					
 @app.route("/stats",  methods=["GET", "POST"])
 def stats():
-	return (render_template("form.html", title="team"))
-	
+	labels = MoodItem.objects.all()
+	values=[]
+	for label in labels:
+		values.append(Mood.objects(user=current_user.id, mood=label).count())
+	colors = [ "red", "blue", "green"]
+	return (render_template("stats.html", title="team",  set=zip(values, labels, colors)))

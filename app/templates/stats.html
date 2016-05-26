@@ -1,0 +1,22 @@
+  {% extends "base.html" %}
+ {% block content %} 
+	<div class="container">
+		{{ super() }}
+		<canvas id="chart"></canvas>
+	<script src="{{url_for('.static', filename='js/chart.min.js')}}"></script>
+	<script>
+	   var Data = [
+            {% for item,label,colors in set %}
+                {
+                    value: "{{item}}",
+                    label: "{{label}}",
+                    color : "{{colors}}"
+                },
+                {% endfor %}
+         ];
+   // draw pie chart
+   var ctx=document.getElementById("chart").getContext("2d");
+   new Chart(ctx).Doughnut(Data);
+</script>
+	</div>
+ {% endblock %}
