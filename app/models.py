@@ -55,3 +55,11 @@ class Mood(db.Document):
 	
 	def __str__(self):
 		return("%s" % self.mood.name)
+
+class Chart:
+	def __init__(self, title, type):
+		self.labels=[]
+		self.values=[]
+		self.colors=[]
+		self.title=title
+		self.type = type

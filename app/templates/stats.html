@@ -1,22 +1,51 @@
-  {% extends "base.html" %}
+{% macro renderchart(chart, i) %}
+{% if  i%3 ==0 %}
+	<div class="row">
+ {% endif %}
+	<div class="col-md-4">
+	<h5>{{ chart.title}}</h5>
+		<canvas id="chart{{i}}"></canvas>
+		<script>
+   var ctx=document.getElementById("chart{{i}}").getContext("2d");
+
+new Chart(ctx, {
+    type: "{{chart.type}}",
+    data: {
+        labels: [{% for item in chart.labels %}
+                  "{{item}}",
+              {% endfor %}],
+        datasets: [{
+            label: '# of Votes',
+            data: [{% for item in chart.values %}
+                      "{{item}}",
+                    {% endfor %}],
+			backgroundColor:  [{% for item in chart.colors %}
+                      "{{item}}",
+                    {% endfor %}]
+        }]
+    },
+    options: {}
+});   
+   
+</script>
+	</div>
+{% if i %3 == 2 %}
+	</div>
+{% endif %}
+
+ {% endmacro %}
+
+
+ 
+ 
+ 
+ {% extends "base.html" %}
  {% block content %} 
 	<div class="container">
 		{{ super() }}
-		<canvas id="chart"></canvas>
-	<script src="{{url_for('.static', filename='js/chart.min.js')}}"></script>
-	<script>
-	   var Data = [
-            {% for item,label,colors in set %}
-                {
-                    value: "{{item}}",
-                    label: "{{label}}",
-                    color : "{{colors}}"
-                },
-                {% endfor %}
-         ];
-   // draw pie chart
-   var ctx=document.getElementById("chart").getContext("2d");
-   new Chart(ctx).Doughnut(Data);
-</script>
+		<script src="{{url_for('.static', filename='js/chart.js')}}"></script>
+		{% for item in charts %}
+			{{renderchart(item, 0) }}
+		{% endfor %}
 	</div>
  {% endblock %}

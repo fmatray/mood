@@ -2,7 +2,7 @@ from flask import render_template, flash, request, redirect, session, url_for
 from flask_nav.elements import Navbar, View, Subgroup, Text, Separator
 from app import app, nav
 from flask.ext.security import login_required
-from .models import User, MoodItem, MoodGroup, Mood, Team
+from .models import User, MoodItem, MoodGroup, Mood, Team, Chart
 from flask_mongoengine.wtf import model_form
 
 from wtforms import SubmitField
@@ -99,14 +99,13 @@ def teamlist():
 	return (render_template("list.html", list=teams, fields=fields, 
 					editurl=url_for("team"), badge="members", title="Teams"))
 
-					
 
-					
 @app.route("/stats",  methods=["GET", "POST"])
 def stats():
-	labels = MoodItem.objects.all()
-	values=[]
-	for label in labels:
-		values.append(Mood.objects(user=current_user.id, mood=label).count())
-	colors = [ "red", "blue", "green"]
-	return (render_template("stats.html", title="team",  set=zip(values, labels, colors)))
+	c1 = Chart("Personal rate", "pie")
+	c1.labels = MoodItem.objects.all()
+	for label in c1.labels:
+		c1.values.append(Mood.objects(user=current_user.id, mood=label).count())
+	c1.colors = [ "red", "blue", "green"]
+	
+	return (render_template("stats.html", title="Statistics",  charts=[c1, c1]))

@@ -1,20 +1,30 @@
- {% macro renderlist(item) %}
-		<li class="list-group-item">
-		{%if badge %}
-			<span class="badge">{{ item[badge]|length }}</span>
-		{% endif %}
-		{% for field in fields %}
-			{% if field != "id" %}
-				<strong>{{ field | capitalize }}</strong> : {{ item[field] |safe }}<br>
+{% macro renderlist(item, i) %}
+{% if  i%3 ==0 %}
+	<div class="row">
+ {% endif %}
+	<div class="col-md-4">
+		<ul class="list-group">
+			<li class="list-group-item">
+			{%if badge %}
+				<span class="badge">{{ item[badge]|length }}</span>
 			{% endif %}
-		{% endfor %}
-		<br>
-		<div class="btn-group" role="group">
-			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
-			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
-			<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
-		</div>
-		</li>
+			{% for field in fields %}
+				{% if field != "id" %}
+					<strong>{{ field | capitalize }}</strong> : {{ item[field] |safe }}<br>
+				{% endif %}
+			{% endfor %}
+			<br>
+			<div class="btn-group" role="group">
+				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
+				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+			</div>
+			</li>
+		</ul>
+	</div>
+{% if i %3 == 2 %}
+	</div>
+{% endif %}
 {% endmacro %}
  
  
@@ -22,12 +32,13 @@
  {% block content %} 
 	<div class="container">
 	{{ super() }}
-		<div class="col-md-12">
+				{% set i = 0 %}
 				{% for item in list %}
-				<ul class="list-group">
-					{{  renderlist(item) }}
-				</ul>
+					{% set i = loop.index-1 %}
+					{{  renderlist(item, i) }}
 				{% endfor %}
-		</div>
+				{% if (i%3) < 2 %}
+					</div>
+				{% endif %}
 	</div>
  {% endblock %}
