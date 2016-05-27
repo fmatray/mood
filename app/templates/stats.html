@@ -3,29 +3,33 @@
 	<div class="row">
  {% endif %}
 	<div class="col-md-4">
-	<h5>{{ chart.title}}</h5>
+	<h5 class="text-center">{{ chart.title}}</h5>
 		<canvas id="chart{{i}}"></canvas>
 		<script>
-   var ctx=document.getElementById("chart{{i}}").getContext("2d");
-
-new Chart(ctx, {
+new Chart(document.getElementById("chart{{i}}").getContext("2d"), {
     type: "{{chart.type}}",
     data: {
         labels: [{% for item in chart.labels %}
                   "{{item}}",
               {% endfor %}],
         datasets: [{
-            label: '# of Votes',
             data: [{% for item in chart.values %}
                       "{{item}}",
                     {% endfor %}],
 			backgroundColor:  [{% for item in chart.colors %}
                       "{{item}}",
                     {% endfor %}]
-        }]
-    },
-    options: {}
-});   
+        }]},
+		options: { 
+			scales : { 
+				yAxes : [{
+					ticks : {
+						beginAtZero: true
+					}
+				}]
+			}
+		}
+	});   
    
 </script>
 	</div>
@@ -37,15 +41,25 @@ new Chart(ctx, {
 
 
  
- 
- 
  {% extends "base.html" %}
  {% block content %} 
 	<div class="container">
 		{{ super() }}
 		<script src="{{url_for('.static', filename='js/chart.js')}}"></script>
-		{% for item in charts %}
-			{{renderchart(item, 0) }}
-		{% endfor %}
+		<script>
+			Chart.defaults.global.responsive = true;
+			Chart.defaults.global.title.display = false;
+			Chart.defaults.global.tooltips.enabled = false;
+		</script>
+				{% set i = 0 %}
+				{% for item in charts %}
+					{% set i = loop.index-1 %}
+						{{renderchart(item, i) }}
+				{% endfor %}
+				{% if (i%3) < 2 %}
+					</div>
+				{% endif %}
+		
+		
 	</div>
  {% endblock %}

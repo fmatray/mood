@@ -107,5 +107,11 @@ def stats():
 	for label in c1.labels:
 		c1.values.append(Mood.objects(user=current_user.id, mood=label).count())
 	c1.colors = [ "red", "blue", "green"]
-	
-	return (render_template("stats.html", title="Statistics",  charts=[c1, c1]))
+
+	c2= Chart("Personal rate", "bar")
+	c2.labels = MoodItem.objects.all()
+	for label in c2.labels:
+		c2.values.append(Mood.objects(user=current_user.id, mood=label).count())
+	c2.colors = [ "red", "blue", "green"]
+
+	return (render_template("stats.html", title="Statistics",  charts=[c1, c2]))
