@@ -2,7 +2,7 @@ from app import db
 from flask.ext.security import UserMixin, RoleMixin, current_user
 from wtforms import validators
 from datetime import datetime
-
+from chartjs import chart
 
 class Role(db.Document, RoleMixin):
 	name = db.StringField(max_length=80, unique=True)
@@ -56,10 +56,12 @@ class Mood(db.Document):
 	def __str__(self):
 		return("%s" % self.mood.name)
 
-class Chart:
-	def __init__(self, title, type):
-		self.labels=[]
-		self.values=[]
-		self.colors=[]
-		self.title=title
-		self.type = type
+class PersoPieChart(chart):
+	def __init__(self):
+		chart.__init__(self, title="Personal rate", ctype="Pie" )
+		self.set_labels = MoodItem.objects.all()
+		dataset = []
+		for label in self.labels:
+			dataset.values.append(Mood.objects(user=current_user.id, mood=label).count())
+		self.add_dataset(dataset)
+		self.set_colors([ "red", "blue", "green"])

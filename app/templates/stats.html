@@ -3,35 +3,7 @@
 	<div class="row">
  {% endif %}
 	<div class="col-md-4">
-	<h5 class="text-center">{{ chart.title}}</h5>
-		<canvas id="chart{{i}}"></canvas>
-		<script>
-new Chart(document.getElementById("chart{{i}}").getContext("2d"), {
-    type: "{{chart.type}}",
-    data: {
-        labels: [{% for item in chart.labels %}
-                  "{{item}}",
-              {% endfor %}],
-        datasets: [{
-            data: [{% for item in chart.values %}
-                      "{{item}}",
-                    {% endfor %}],
-			backgroundColor:  [{% for item in chart.colors %}
-                      "{{item}}",
-                    {% endfor %}]
-        }]},
-		options: { 
-			scales : { 
-				yAxes : [{
-					ticks : {
-						beginAtZero: true
-					}
-				}]
-			}
-		}
-	});   
-   
-</script>
+		{{ chart.make_chart()|safe }}
 	</div>
 {% if i %3 == 2 %}
 	</div>
@@ -45,7 +17,7 @@ new Chart(document.getElementById("chart{{i}}").getContext("2d"), {
  {% block content %} 
 	<div class="container">
 		{{ super() }}
-		<script src="{{url_for('.static', filename='js/chart.js')}}"></script>
+		<script src="{{url_for('.static', filename='js/chart.min.js')}}"></script>
 		<script>
 			Chart.defaults.global.responsive = true;
 			Chart.defaults.global.title.display = false;
