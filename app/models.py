@@ -37,6 +37,8 @@ class Team(db.Document):
 			
 class MoodItem(db.Document):
 	name=db.StringField(max_length=32)
+	color=db.StringField(max_length=10)
+
 	def __str__(self):
 		return("%s" % self.name)
 		

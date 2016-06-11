@@ -1,26 +1,32 @@
 from .models import User, MoodItem, MoodGroup, Mood, Team
 from flask_security import current_user
-from chartjs import chart
+from pygal import Pie, Bar
+from pygal.style import Style
+import humanize
 
-class PersoPieChart(chart):
+custom_style = Style(
+  background='transparent',
+  plot_background='transparent',
+  title_font_size=30,
+  opacity='.6',
+  opacity_hover='1',
+  transition='400ms ease-in')
+
+
+class PersoPieChart(Pie):
 	def __init__(self):
-		chart.__init__(self, title="Personal rate", ctype="Pie")
-		self.canvas="canvas1"
-		labels = []
-		dataset = []
+		Pie.__init__(self, inner_radius=0.5, style=custom_style)
+		self.title="Personal"
 		for label in MoodItem.objects.all():
-			labels.append(label)
-			dataset.append(Mood.objects(user=current_user.id, mood=label).count())
-		self.set_labels(labels)
-		self.set_colors([ "#FF0000", "#0000FF", "#00FF00"])
-		self.set_highlights([ "#AA0000", "#0000AA", "#00AA00"])
-		self.add_dataset(dataset)
+			value = Mood.objects(user=current_user.id, mood=label).count()
+			self.add(label.__str__(), 
+				[ { "value" : value, "color" : label.color } ])
 
-class PersoHistoChart(chart):
+class PersoHistoChart(Bar):
 	def __init__(self):
-		chart.__init__(self, title="Personal rate", ctype="Bar" )
-		self.canvas="canvas2"
-		self.set_labels([ "#FF0000", "#0000FF", "#00FF00"])
-		self.set_colors([ "#FF0000", "#0000FF", "#00FF00"])
-		self.set_highlights([ "#AA0000", "#0000AA", "#00AA00"])
-		self.add_dataset([1,2,3])
+		Bar.__init__(self, inner_radius=0.5, style=custom_style)
+
+		for  item in Mood.objects(user=current_user.id):
+			self.add(humanize.naturalday(item.date), 
+				[ { "value" : 2, "color" : "blue" } ])
+		self.x_labels = map(str, range(2015, 2017))
