@@ -1,12 +1,14 @@
 from flask import render_template, flash, request, redirect, session, url_for
 from flask_nav.elements import Navbar, View, Subgroup, Text, Separator
 from app import app, nav
-from flask.ext.security import login_required
-from .models import User, MoodItem, MoodGroup, Mood, Team, PersoPieChart
+from flask_security import login_required
+from .models import User, MoodItem, MoodGroup, Mood, Team
+from .stats import PersoPieChart, PersoHistoChart
 from flask_mongoengine.wtf import model_form
 
 from wtforms import SubmitField
 from flask.ext.security import current_user
+
 
 
 @nav.navigation()
@@ -103,4 +105,5 @@ def teamlist():
 @app.route("/stats",  methods=["GET", "POST"])
 def stats():
 	c1=PersoPieChart()
-	return (render_template("stats.html", title="Statistics",  charts=[c1]))
+	c2=PersoHistoChart()
+	return (render_template("stats.html", title="Statistics",  charts=[c1, c2]))

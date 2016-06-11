@@ -6,8 +6,8 @@ from flask_mongoengine import MongoEngine
 from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from flask_admin.contrib.mongoengine import ModelView
-from flask.ext.security import Security, MongoEngineUserDatastore, UserMixin, RoleMixin, login_required, current_user
-from flask.ext.login import LoginManager
+from flask_security import Security, MongoEngineUserDatastore, UserMixin, RoleMixin, login_required, current_user
+from flask_login import LoginManager
 from flask_mail import Mail
 
 app=Flask(__name__)
