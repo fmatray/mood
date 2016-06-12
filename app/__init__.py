@@ -48,6 +48,7 @@ from .models import *
 admin.add_view(SecuredModelView(User))
 admin.add_view(SecuredModelView(Role))
 admin.add_view(SecuredModelView(Team))
+admin.add_view(SecuredModelView(Mood))
 admin.add_view(SecuredModelView(MoodItem))
 admin.add_view(SecuredModelView(MoodGroup))
 

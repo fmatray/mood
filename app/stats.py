@@ -1,6 +1,6 @@
 from .models import User, MoodItem, MoodGroup, Mood, Team
 from flask_security import current_user
-from pygal import Pie, Bar
+from pygal import Pie, StackedBar
 from pygal.style import Style
 import humanize
 
@@ -22,11 +22,32 @@ class PersoPieChart(Pie):
 			self.add(label.__str__(), 
 				[ { "value" : value, "color" : label.color } ])
 
-class PersoHistoChart(Bar):
-	def __init__(self):
-		Bar.__init__(self, inner_radius=0.5, style=custom_style)
+class Moodlist():	
+	def __init__(self, name, color):
+		self.moods=[]
+		self.name=name
+		self.color=color
 
-		for  item in Mood.objects(user=current_user.id):
-			self.add(humanize.naturalday(item.date), 
-				[ { "value" : 2, "color" : "blue" } ])
-		self.x_labels = map(str, range(2015, 2017))
+	def __repr__(self):
+		return self.name 
+		
+class PersoHistoChart(StackedBar):
+	def __init__(self):
+		StackedBar.__init__(self, style=custom_style)
+		moods=dict()
+		for m in MoodItem.objects.all():
+			moods[m.id] = Moodlist(m.name, m.color)
+		xlabels = []
+		for item in Mood._get_collection().aggregate([ { "$group" : { "_id" : { "month": { "$month": "$date" },  "year": { "$year": "$date" }, "mood" : "$mood" }, 
+			"nb" : { "$sum" : 1 } }}  ,
+			{"$sort" : { "_id.year" : 1, "_id.month" : 1  } }
+			]):
+			if item["_id"]["month"] not in xlabels:
+				xlabels.append(item["_id"]["month"]) 
+			moods[item["_id"]["mood"]].moods.append(item["nb"])
+		print (moods)
+		self.x_labels = xlabels
+		for m in moods:
+			print (moods[m].name)
+			print (moods[m].moods)
+			self.add(moods[m].name, moods[m].moods)
