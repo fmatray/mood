@@ -10,8 +10,13 @@ from flask_security import Security, MongoEngineUserDatastore, UserMixin, RoleMi
 from flask_login import LoginManager
 from flask_mail import Mail
 
+from flask_humanize import Humanize
+
 app=Flask(__name__)
 app.config.from_object("config")
+
+humanize = Humanize(app)
+
 
 mail = Mail(app)
 

@@ -7,7 +7,7 @@ import bson
 
 custom_style = Style(
   background='transparent',
-  plot_background='transparent',
+  plot_background='white',
   font_family="sans-serif",
   title_font_size=30,
   opacity='.6',
@@ -25,7 +25,6 @@ class PersoPieChart(Pie):
 				[ { "value" : value, "color" : label.color } ])
 
 
-		
 class PersoHistoChart(StackedBar):
 	def __init__(self):
 		StackedBar.__init__(self, style=custom_style)

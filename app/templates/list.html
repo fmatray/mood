@@ -10,14 +10,20 @@
 			{% endif %}
 			{% for field in fields %}
 				{% if field != "id" %}
-					<strong>{{ field | capitalize }}</strong> : {{ item[field] |safe }}<br>
+					<strong>{{ field | capitalize }}</strong> : 
+					{% if field == "date" %}
+						{{ item[field] | humanize('naturaldate') }} 
+					{% else %}
+						{{ item[field] |safe }} 
+					{% endif %}
+					<br>
 				{% endif %}
 			{% endfor %}
 			<br>
 			<div class="btn-group" role="group">
 				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
 				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
-				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+				<a href="{{editurl}}/delete/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
 			</div>
 			</li>
 		</ul>
