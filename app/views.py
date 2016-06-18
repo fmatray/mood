@@ -67,7 +67,7 @@ def moodview(mood_id=None):
 			return redirect("/moodlist")
 	else:
 		return redirect("/index")
-	return (render_template("view.html", element=m, editurl=url_for("mood"), title="Mood"))
+	return (render_template("view.html", element=m, editurl=url_for("mood"), title="Mood", long=True))
 
 @app.route("/mood/delete/<mood_id>")
 @login_required
@@ -111,22 +111,19 @@ def profile():
 @app.route("/team/edit/<team_id>",  methods=["GET", "POST"])
 @login_required
 def team(team_id=None):
-	try: 
-		if team_id:
-			t=Team.objects.get(id=team_id)
-		else:
-			t=Team()
-		t.admin=User.objects.get(id=current_user.id)
-		Teamform=model_form(Team, only=["name", "description"])
-		Teamform.submit=SubmitField('Go')
-		form=Teamform(request.form, t)
-		if  form.validate_on_submit():
-			form.populate_obj(t)
-			t.save()
-			flash("Thanks a lot", "success")
-			return (redirect("/index"))
-	except:
-		flash("Team update error", "error")
+	if team_id:
+		t=Team.objects.get(id=team_id)
+	else:
+		t=Team()
+	t.admin=User.objects.get(id=current_user.id)
+	Teamform=model_form(Team, only=["name", "description"])
+	Teamform.submit=SubmitField('Go')
+	form=Teamform(request.form, t)
+	if  form.validate_on_submit():
+		form.populate_obj(t)
+		t.save()
+		flash("Thanks a lot", "success")
+		return (redirect("/index"))
 	return (render_template("form.html", form=form, title="Team"))
 
 @app.route("/team/view/")
@@ -135,13 +132,14 @@ def team(team_id=None):
 def teamview(team_id=None):
 	if team_id:
 		try:
-			m=Team.objects.get(id=team_id)
+			t=Team.objects.get(id=team_id)
+			print(dir(t.members))
 		except:
 			flash("Team not found", "error")
 			return redirect("/teamlist")
 	else:
 		return redirect("/index")
-	return (render_template("view.html", element=m,  editurl=url_for("team"), title="Team"))
+	return (render_template("view.html", element=t,  editurl=url_for("team"), title="Team", long=True))
 
 
 @app.route("/team/delete/<team_id>")
@@ -174,7 +172,7 @@ def teaminvite(team_id=None):
 				flash("User allready in the team", "error")	
 		else:
 			u=User(email=form.email.data).save()
-			t.update(push__members=u)
+			t.update(add_to_set__members=u)
 			flash("Email sent", "success")
 		return (redirect("/index"))	
 	return  (render_template("form.html", form=form, title="Invite"))

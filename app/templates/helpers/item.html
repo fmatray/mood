@@ -1,6 +1,6 @@
 {% from "helpers/confirm.html" import confirm as confirm %}
 
- {% macro renderitem(element, badge, editurl) %} 
+ {% macro renderitem(element, badge, editurl, long=False) %} 
 			{% if element.renderfields %}
 				{% set fields = element.renderfields %}
 			{% else %}
@@ -29,7 +29,11 @@
 							</ul>
 						<dd>
 					{% else %}
-						<dd>{{ element[field]  | capitalize | truncate(25) }}</dd>
+						{% if long %}
+							<dd>{{ element[field]  | capitalize  }}</dd>
+						{% else %}
+							<dd>{{ element[field]  | capitalize | truncate(25) }}</dd>						
+						{% endif %}
 					{% endif %}
 				{% endif %}
 			{% endfor %}
