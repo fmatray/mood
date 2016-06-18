@@ -20,13 +20,18 @@ class User(UserMixin, db.Document):
 	confirmed_at = db.DateTimeField()
 	roles = db.ListField(db.ReferenceField(Role), default=[])
 	
-	renderfields= ("name", "email", "description")
+	renderfields= ("name", "email", "description", "teams")
+	renderfieldsaslist = ("teams")
 	def __str__(self):
 		if (self.name):
 			return("%s" % self.name)
 		else:
 			return("%s" % self.email)
 
+	@property
+	def teams(self):
+		return Team.objects(members=current_user.id)
+	
 class Team(db.Document):
 	name=db.StringField(max_length=80, unique=True)
 	description=db.StringField(max_length=255)
@@ -34,6 +39,8 @@ class Team(db.Document):
 	date=db.DateTimeField(default=datetime.now, required=True)
 	members=db.ListField(db.ListField(db.ReferenceField(User), default=[]))
 	renderfields=("name", "description", "admin", "members")
+	renderfieldsaslist=("members")
+	
 	def __str__(self):
 		return("%s" % self.name)
 			

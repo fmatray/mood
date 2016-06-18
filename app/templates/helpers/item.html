@@ -1,40 +1,46 @@
 {% from "helpers/confirm.html" import confirm as confirm %}
 
  {% macro renderitem(element, badge, editurl) %} 
-		<ul class="list-group">
-			<li class="list-group-item">
-			{%if badge %}
-				<span class="badge">{{ element[badge]|length }}</span>
-			{% endif %}
-			
 			{% if element.renderfields %}
 				{% set fields = element.renderfields %}
 			{% else %}
 				{% set fields = element._fields.keys() %}
 			{% endif %}
+
+	<div class="list-group">
+		<dl class="list-group-item">
+			{%if badge %}
+				<span class="badge">{{ element[badge]|length }}</span>
+			{% endif %}			
+
 			{% for field in fields %}
 				{% if field != "id" %}
-					<strong>{{ field | title }}</strong> : 
-					{% if field == "date" %}
-						{{ element[field] | humanize('naturaldate') }} <br>
-					{% elif field == "members" %}
-						<ul class="list-group">
-						{% for i in element[field] %}
-							<li class="list-group-item">{{ i  | capitalize }}</li>
-						{% endfor %}
-						</ul>
+					<dt>{{ field | title }}</dt>
+					{% if not element[field]  %}
+						<dd>&nbsp;</dd>
+					{% elif field == "date" %}
+						<dd>{{ element[field] | humanize('naturaldate') }} </dd>
+					{% elif field in  element.renderfieldsaslist%}
+						<dd>
+							<ul>
+							{% for i in element[field] %}
+								<li>{{ i  | capitalize }}</li>
+							{% endfor %}
+							</ul>
+						<dd>
 					{% else %}
-						{{ element[field] | safe | capitalize | truncate(25) }}<br> 
+						<dd>{{ element[field]  | capitalize | truncate(25) }}</dd>
 					{% endif %}
 				{% endif %}
 			{% endfor %}
+		</dl>
 			{% if editurl %}
-				<div class="btn-group" role="group">
-					<a href="{{editurl}}/view/{{ element['id'] }}" role="button" type="button" class="btn btn-default">View</a>
-					<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+				<div class="btn-group btn-group-justified" role="group">
+					<a href="{{editurl}}/view/{{ element['id'] }}" role="button" type="button" class="btn btn-primary">View</a>
+					<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-primary">Edit</a>
 					{{ confirm(editurl, element['id']) }}
 				</div>
 			{% endif %}
-			</li>
-		</ul>
+
+	</div>
  {% endmacro %}
