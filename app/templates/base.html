@@ -8,9 +8,19 @@
 	{{super()}}
 	{{fixes.ie8()}}
 {%- endblock %}
+
 {% block scripts %}
 	{{ super() }}
-
+	<script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
+	<script>
+function DeleteItem(url)
+    {
+        bootbox.confirm("You can't undo this action. Are you sure?", function(result){
+            if(result)
+            { window.location.href = url }
+        });
+    }
+</script>
 {% endblock %}
 
 {% block styles -%}

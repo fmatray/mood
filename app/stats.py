@@ -27,7 +27,7 @@ class PersoPieChart(Pie):
 
 class PersoHistoChart(StackedBar):
 	def __init__(self):
-		StackedBar.__init__(self, style=custom_style)
+		StackedBar.__init__(self, style=custom_style, range=(0, 30), order_min=1)
 		self.title="Personal history"
 		moods= OrderedDict()
 		for label in MoodItem.objects.order_by("order"):			

@@ -1,3 +1,5 @@
+ {% from "helpers/confirm.html" import confirm as confirm %}
+
 {% macro renderlist(item, i) %}
 {% if  i%3 ==0 %}
 	<div class="row">
@@ -23,7 +25,7 @@
 			<div class="btn-group" role="group">
 				<a href="{{editurl}}/view/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
 				<a href="{{editurl}}/edit/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
-				<a href="{{editurl}}/delete/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+				{{ confirm(editurl, item['id']) }}
 			</div>
 			</li>
 		</ul>

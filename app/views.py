@@ -14,8 +14,9 @@ import datetime
 
 @nav.navigation()
 def moodnavbar():
-	sg1=Subgroup("Mood view", View("Mood", "mood"), View("Mood List", "moodlist"), Separator(),View("Team", "team"), View("Team List", "teamlist"),Separator(),View("Statistics", "stats"))
-	sg2=Subgroup("Auth", View("Login", "security.login"), View("Profile", "profile"),View("Logout", "security.logout"), View("Change password", "security.change_password"), 
+	sg1=Subgroup("Moods", View("Mood", "mood"), View("Mood List", "moodlist"), Separator(), View("Statistics", "personalstats"))
+	sg2=Subgroup("Teams", View("Team", "team"), View("Team List", "teamlist"),Separator(), View("Statistics", "teamstats"))
+	sg3=Subgroup("Auth", View("Login", "security.login"), View("Profile", "profile"),View("Logout", "security.logout"), View("Change password", "security.change_password"), 
 									Separator(),View("Register", "security.register"))
 	if (current_user.is_authenticated):
 		msg="Welcome "
@@ -25,7 +26,7 @@ def moodnavbar():
 			msg=msg + current_user.email
 	else:
 		msg="Please login or register"
-	return (Navbar('Mood', View('Home', 'index'), sg1, sg2, View("Admin", "admin.index"), Text(msg)))
+	return (Navbar('Mood', View('Home', 'index'), sg1, sg2, sg3, View("Admin", "admin.index"), Text(msg)))
 
 
 @app.route("/index")
@@ -91,6 +92,9 @@ def moodlist():
 			print (i[f].__class__ is datetime.datetime )
 	return (render_template("list.html", list=moods, fields=fields,  editurl=url_for("mood"), title="Moods"))
 
+
+
+
 @app.route("/profile",  methods=["GET", "POST"])
 @login_required
 def profile():
@@ -104,6 +108,8 @@ def profile():
 		flash("Profile Updated", "success")
 		return (redirect("/index"))
 	return (render_template("form.html", form=form, title="profile"))
+
+
 
 
 @app.route("/team",  methods=["GET", "POST"])
@@ -188,10 +194,17 @@ def teamlist():
 	return (render_template("list.html", list=teams, fields=fields, 
 					editurl=url_for("team"), badge="members", title="Teams"))
 
+""" Statistics"""
 
-@app.route("/stats",  methods=["GET", "POST"])
+@app.route("/personnal/stats")
 @login_required
-def stats():
+def personalstats():
 	c1=PersoPieChart()
 	c2=PersoHistoChart()
-	return (render_template("stats.html", title="Statistics",  charts=[c1, c2]))
+	return (render_template("stats.html", title="Personal statistics",  charts=[c1, c2]))
+	
+@app.route("/team/stats")	
+@app.route("/team/stats/<team_id>")
+@login_required
+def teamstats(team_id=None):
+	return (render_template("stats.html", title="Team statistics",  charts=[]))

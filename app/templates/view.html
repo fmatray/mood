@@ -1,4 +1,6 @@
  {% extends "base.html" %}
+ {% from "helpers/confirm.html" import confirm as confirm %}
+ 
  {% block content %} 
 	<div class="container">
 	{{ super() }}
@@ -27,7 +29,7 @@
 			<br>
 			<div class="btn-group" role="group">
 				<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
-				<a href="{{editurl}}/delete/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+				{{ confirm(editurl, element['id']) }}
 			</div>
 			</li>
 		</ul>
