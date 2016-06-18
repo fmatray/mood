@@ -67,8 +67,7 @@ def moodview(mood_id=None):
 			return redirect("/moodlist")
 	else:
 		return redirect("/index")
-	fields=("mood", "date", "comment")
-	return (render_template("view.html", element=m, fields=fields, editurl=url_for("mood"), title="Mood"))
+	return (render_template("view.html", element=m, editurl=url_for("mood"), title="Mood"))
 
 @app.route("/mood/delete/<mood_id>")
 @login_required
@@ -86,11 +85,7 @@ def deletemood(mood_id=None):
 @login_required
 def moodlist():
 	moods=Mood.objects(user=current_user.id).order_by("-date")
-	fields=("mood", "date", "comment")
-	for i in moods:
-		for f in fields:
-			print (i[f].__class__ is datetime.datetime )
-	return (render_template("list.html", list=moods, fields=fields,  editurl=url_for("mood"), title="Moods"))
+	return (render_template("list.html", list=moods,  editurl=url_for("mood"), title="Moods"))
 
 
 
@@ -99,7 +94,7 @@ def moodlist():
 @login_required
 def profile():
 	user=User.objects.get(id=current_user.id)
-	Userform=model_form(User, only=["name", "teams"])
+	Userform=model_form(User, only=["name", "teams", "description"])
 	Userform.submit=SubmitField('Go')
 	form=Userform(request.form, user)
 	if  form.validate_on_submit():
@@ -146,8 +141,7 @@ def teamview(team_id=None):
 			return redirect("/teamlist")
 	else:
 		return redirect("/index")
-	fields=("name", "description", "admin", "members")
-	return (render_template("viewteam.html", element=m, fields=fields, editurl=url_for("team"), title="Team"))
+	return (render_template("view.html", element=m,  editurl=url_for("team"), title="Team"))
 
 
 @app.route("/team/delete/<team_id>")
@@ -190,8 +184,7 @@ def teaminvite(team_id=None):
 @login_required
 def teamlist():
 	teams=Team.objects(admin=current_user.id).order_by("name")
-	fields=("name", "description", "admin")
-	return (render_template("list.html", list=teams, fields=fields, 
+	return (render_template("list.html", list=teams,
 					editurl=url_for("team"), badge="members", title="Teams"))
 
 """ Statistics"""
@@ -201,7 +194,8 @@ def teamlist():
 def personalstats():
 	c1=PersoPieChart()
 	c2=PersoHistoChart()
-	return (render_template("stats.html", title="Personal statistics",  charts=[c1, c2]))
+	user=User.objects.get(id=current_user.id)
+	return (render_template("stats.html", title="Personal statistics",  item=user, charts=[c1, c2]))
 	
 @app.route("/team/stats")	
 @app.route("/team/stats/<team_id>")

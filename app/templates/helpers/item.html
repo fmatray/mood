@@ -1,0 +1,40 @@
+{% from "helpers/confirm.html" import confirm as confirm %}
+
+ {% macro renderitem(element, badge, editurl) %} 
+		<ul class="list-group">
+			<li class="list-group-item">
+			{%if badge %}
+				<span class="badge">{{ element[badge]|length }}</span>
+			{% endif %}
+			
+			{% if element.renderfields %}
+				{% set fields = element.renderfields %}
+			{% else %}
+				{% set fields = element._fields.keys() %}
+			{% endif %}
+			{% for field in fields %}
+				{% if field != "id" %}
+					<strong>{{ field | title }}</strong> : 
+					{% if field == "date" %}
+						{{ element[field] | humanize('naturaldate') }} <br>
+					{% elif field == "members" %}
+						<ul class="list-group">
+						{% for i in element[field] %}
+							<li class="list-group-item">{{ i  | capitalize }}</li>
+						{% endfor %}
+						</ul>
+					{% else %}
+						{{ element[field] | safe | capitalize | truncate(25) }}<br> 
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+			{% if editurl %}
+				<div class="btn-group" role="group">
+					<a href="{{editurl}}/view/{{ element['id'] }}" role="button" type="button" class="btn btn-default">View</a>
+					<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+					{{ confirm(editurl, element['id']) }}
+				</div>
+			{% endif %}
+			</li>
+		</ul>
+ {% endmacro %}

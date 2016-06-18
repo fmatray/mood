@@ -1,34 +1,12 @@
- {% from "helpers/confirm.html" import confirm as confirm %}
+{% from "helpers/confirm.html" import confirm as confirm %}
+{% from "helpers/item.html" import renderitem as renderitem %}
 
 {% macro renderlist(item, i) %}
 {% if  i%3 ==0 %}
 	<div class="row">
  {% endif %}
 	<div class="col-md-4">
-		<ul class="list-group">
-			<li class="list-group-item">
-			{%if badge %}
-				<span class="badge">{{ item[badge]|length }}</span>
-			{% endif %}
-			{% for field in fields %}
-				{% if field != "id" %}
-					<strong>{{ field | title }}</strong> : 
-					{% if field == "date" %}
-						{{ item[field] | humanize('naturaldate') }} 
-					{% else %}
-						{{ item[field] |safe | capitalize | truncate(20) }} 
-					{% endif %}
-					<br>
-				{% endif %}
-			{% endfor %}
-			<br>
-			<div class="btn-group" role="group">
-				<a href="{{editurl}}/view/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
-				<a href="{{editurl}}/edit/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
-				{{ confirm(editurl, item['id']) }}
-			</div>
-			</li>
-		</ul>
+		{{ renderitem(item, badge, editurl) }}
 	</div>
 {% if i %3 == 2 %}
 	</div>

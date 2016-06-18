@@ -1,8 +1,11 @@
+{% extends "base.html" %}
+{% from "helpers/item.html" import renderitem as renderitem %}
+
 {% macro renderchart(chart, i) %}
 {% if  i%3 ==0 %}
 	<div class="row">
  {% endif %}
-	<div class="col-xs-6">
+	<div class="col-md-4">
 		<embed type="image/svg+xml" src= {{ chart.render_data_uri()|safe }} />
 	</div>
 {% if i %3 == 2 %}
@@ -13,26 +16,21 @@
 
 
  
- {% extends "base.html" %}
  {% block content %} 
 	<div class="container">
 		{{ super() }}
-    <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
-    <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>	
 	    <div class="row">
-	    <div class="col-xs-3">
-	    	
+	    <div class="col-md-4">
+	    	{{ renderitem(item, badge, editurl) }}
 	    </div>
-	    <div class="col-xs-9">	    
 				{% set i = 0 %}
 				{% for item in charts %}
-					{% set i = loop.index-1 %}
+					{% set i = loop.index %}
 						{{renderchart(item, i) }}
 				{% endfor %}
 				{% if (i%3) < 2 %}
 					</div>
 				{% endif %}
-		</div>
 		</div>
 	</div>
  {% endblock %}
