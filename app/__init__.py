@@ -62,6 +62,7 @@ user_datastore = MongoEngineUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 login_manager = LoginManager()
+login_manager.login_view = "security.login"
 login_manager.init_app(app)
 
 @login_manager.user_loader
@@ -75,4 +76,6 @@ def security_context_processor():
         admin_view=admin.index_view,
         h=admin_helpers,
     )
+    
+
 from app import views

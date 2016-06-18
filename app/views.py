@@ -8,6 +8,7 @@ from flask_mongoengine.wtf import model_form
 
 from wtforms import SubmitField
 from flask.ext.security import current_user
+from .forms import TeamInvite
 import datetime
 
 
@@ -30,11 +31,12 @@ def moodnavbar():
 @app.route("/index")
 @app.route("/")
 def index():
-	return (render_template("index.html", title="Welcome"))
+	form=TeamInvite()
+	return (render_template("index.html", form=form, title="Welcome"))
 
 
 @app.route("/mood",  methods=["GET", "POST"])
-@app.route("/mood/<mood_id>",  methods=["GET", "POST"])
+@app.route("/mood/edit/<mood_id>",  methods=["GET", "POST"])
 @login_required
 def mood(mood_id=None):
 	if mood_id:
@@ -52,6 +54,21 @@ def mood(mood_id=None):
 		return (redirect("/index"))
 	return (render_template("form.html", form=form, title="How do you feel today ?"))
 
+@app.route("/mood/view/")
+@app.route("/mood/view/<mood_id>")
+@login_required
+def moodview(mood_id=None):
+	if mood_id:
+		try:
+			m=Mood.objects.get(id=mood_id)
+		except:
+			flash("Mood not found", "error")
+			return redirect("/moodlist")
+	else:
+		return redirect("/index")
+	fields=("mood", "date", "comment")
+	return (render_template("view.html", element=m, fields=fields, editurl=url_for("mood"), title="Mood"))
+
 @app.route("/mood/delete/<mood_id>")
 @login_required
 def deletemood(mood_id=None):
@@ -67,7 +84,7 @@ def deletemood(mood_id=None):
 @app.route("/moodlist")
 @login_required
 def moodlist():
-	moods=Mood.objects(user=current_user.id)
+	moods=Mood.objects(user=current_user.id).order_by("-date")
 	fields=("mood", "date", "comment")
 	for i in moods:
 		for f in fields:
@@ -90,7 +107,7 @@ def profile():
 
 
 @app.route("/team",  methods=["GET", "POST"])
-@app.route("/team/<team_id>",  methods=["GET", "POST"])
+@app.route("/team/edit/<team_id>",  methods=["GET", "POST"])
 @login_required
 def team(team_id=None):
 	try: 
@@ -111,6 +128,22 @@ def team(team_id=None):
 		flash("Team update error", "error")
 	return (render_template("form.html", form=form, title="Team"))
 
+@app.route("/team/view/")
+@app.route("/team/view/<team_id>")
+@login_required
+def teamview(team_id=None):
+	if team_id:
+		try:
+			m=Team.objects.get(id=team_id)
+		except:
+			flash("Team not found", "error")
+			return redirect("/teamlist")
+	else:
+		return redirect("/index")
+	fields=("name", "description", "admin", "members")
+	return (render_template("viewteam.html", element=m, fields=fields, editurl=url_for("team"), title="Team"))
+
+
 @app.route("/team/delete/<team_id>")
 @login_required
 def deleteteam(team_id=None):
@@ -123,18 +156,41 @@ def deleteteam(team_id=None):
 			flash("Team not found", "error")
 	return (redirect("/teamlist"))
 
+@app.route("/team/invite/<team_id>",  methods=["GET", "POST"])
+@login_required
+def teaminvite(team_id=None):
+	if not team_id:
+		flash("No team ", "error")
+		return (redirect("/index"))	
+	t=Team.objects.get(id=team_id)
+	form=TeamInvite()
+	if  form.validate_on_submit():
+		u=User.objects(email=form.email.data).first()
+		if u:
+			if not Team.objects(members=u):
+				t.update(add_to_set__members=u)
+				flash("User added", "success")
+			else:
+				flash("User allready in the team", "error")	
+		else:
+			u=User(email=form.email.data).save()
+			t.update(push__members=u)
+			flash("Email sent", "success")
+		return (redirect("/index"))	
+	return  (render_template("form.html", form=form, title="Invite"))
 
 
 @app.route("/teamlist")
 @login_required
 def teamlist():
-	teams=Team.objects(admin=current_user.id)
+	teams=Team.objects(admin=current_user.id).order_by("name")
 	fields=("name", "description", "admin")
 	return (render_template("list.html", list=teams, fields=fields, 
 					editurl=url_for("team"), badge="members", title="Teams"))
 
 
 @app.route("/stats",  methods=["GET", "POST"])
+@login_required
 def stats():
 	c1=PersoPieChart()
 	c2=PersoHistoChart()

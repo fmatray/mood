@@ -10,19 +10,19 @@
 			{% endif %}
 			{% for field in fields %}
 				{% if field != "id" %}
-					<strong>{{ field | capitalize }}</strong> : 
+					<strong>{{ field | title }}</strong> : 
 					{% if field == "date" %}
 						{{ item[field] | humanize('naturaldate') }} 
 					{% else %}
-						{{ item[field] |safe }} 
+						{{ item[field] |safe | capitalize | truncate(20) }} 
 					{% endif %}
 					<br>
 				{% endif %}
 			{% endfor %}
 			<br>
 			<div class="btn-group" role="group">
-				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
-				<a href="{{editurl}}/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+				<a href="{{editurl}}/view/{{ item['id'] }}" role="button" type="button" class="btn btn-default">View</a>
+				<a href="{{editurl}}/edit/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
 				<a href="{{editurl}}/delete/{{ item['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
 			</div>
 			</li>

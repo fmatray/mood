@@ -1,0 +1,38 @@
+ {% extends "base.html" %}
+ {% block content %} 
+	<div class="container">
+	{{ super() }}
+	<div class="row">
+	<div class="col-md-12">
+		<ul class="list-group">
+			<li class="list-group-item">
+			{%if badge %}
+				<span class="badge">{{ element[badge]|length }}</span>
+			{% endif %}
+			{% for field in fields %}
+				{% if field != "id" %}
+					<strong>{{ field | title }}</strong> : 
+					{% if field == "date" %}
+						{{ element[field] | humanize('naturaldate') }}  <br>
+					{% elif field == "members" %}
+						<ul class="list-group">
+						{% for i in element[field] %}
+							<li class="list-group-item">{{ i  | capitalize }}</li>
+						{% endfor %}
+						</ul>
+					{% else %}
+						{{ element[field] | safe | capitalize | truncate(20) }} <br>
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+			<div class="btn-group" role="group">
+				<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Edit</a>
+				<a href="{{editurl}}/invite/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Invite</a>
+				<a href="{{editurl}}/delete/{{ element['id'] }}" role="button" type="button" class="btn btn-default">Delete</a>
+			</div>
+			</li>
+		</ul>
+	</div>
+	</div>
+	</div>
+ {% endblock %}
