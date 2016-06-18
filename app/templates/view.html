@@ -15,15 +15,14 @@
 				{% if field != "id" %}
 					<strong>{{ field | title }}</strong> : 
 					{% if field == "date" %}
-						{{ element[field] | humanize('naturaldate') }} 
+						{{ element[field] | humanize('naturaldate') }} <br>
 					{% elif field == "members" %}
 						{% for i in element[field] %}
-							{{ i  | capitalize }} 
+							{{ i  | capitalize }} <br>
 						{% endfor %}
 					{% else %}
-						{{ element[field] | safe | capitalize | truncate(20) }} 
+						{{ element[field] | safe | capitalize | truncate(20) }}<br> 
 					{% endif %}
-					<br>
 				{% endif %}
 			{% endfor %}
 			<br>

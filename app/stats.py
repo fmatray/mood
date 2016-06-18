@@ -4,6 +4,7 @@ from pygal import Pie, StackedBar
 from pygal.style import Style
 from collections import OrderedDict
 import bson
+from datetime import date
 
 custom_style = Style(
   background='transparent',
@@ -17,8 +18,8 @@ custom_style = Style(
 
 class PersoPieChart(Pie):
 	def __init__(self):
-		Pie.__init__(self, inner_radius=0.5, style=custom_style)
-		self.title="Personal"
+		Pie.__init__(self, inner_radius=0.5, style=custom_style, show_legend=False)
+		self.title="Distribution"
 		for label in MoodItem.objects.order_by("order"):
 			value = Mood.objects(user=current_user.id, mood=label).count()
 			self.add(label.__str__(), 
@@ -27,17 +28,17 @@ class PersoPieChart(Pie):
 
 class PersoHistoChart(StackedBar):
 	def __init__(self):
-		StackedBar.__init__(self, style=custom_style, range=(0, 30), order_min=1)
-		self.title="Personal history"
+		StackedBar.__init__(self, style=custom_style, order_min=1, show_legend=False)
+		self.x_title=str(date.today().year)
+		self.title="Monthly history"
 		moods= OrderedDict()
 		for label in MoodItem.objects.order_by("order"):			
 			moods[label.name] = [None] * 12
 		self.x_labels = map(str, range(1, 13))
-		
 		for item in Mood._get_collection().aggregate([ {"$match":{"user": bson.objectid.ObjectId(  str(current_user.id))  }  },
 			{ "$lookup": {"from":"mood_item", "localField":"mood", "foreignField":"_id", "as":"mood"  } },
 			{"$group" : {"_id":{ "mood":"$mood.name",  "color" : "$mood.color", "month" : { "$month": "$date"}, "year" : { "$year":"$date"} }, "count": { "$sum":1} }  }]):
 			moods[item["_id"]["mood"][0]][item["_id"]["month"]-1] = {"value" : item["count"] , "color" : item["_id"]["color"][0] }
-		
+		self.range = (0, 31)
 		for m in moods.keys():
 			self.add(m, moods[m])
