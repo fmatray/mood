@@ -2,6 +2,7 @@ from app import db
 from flask_security import UserMixin, RoleMixin, current_user
 from wtforms import validators
 from datetime import datetime
+from flask import  flash
 
 class Role(db.Document, RoleMixin):
 	name = db.StringField(max_length=80, unique=True)
@@ -30,16 +31,46 @@ class User(UserMixin, db.Document):
 
 	@property
 	def teams(self):
-		return Team.objects(members=current_user.id)
-	
+		return Team.objects.filter(members__user=self)
+		
+class Member(db.EmbeddedDocument):
+	user=db.ReferenceField(User, required=True)
+	start=db.DateTimeField(default=datetime.now, required=True)
+	end=db.DateTimeField(default=datetime.now)
+	active = db.BooleanField(default=True)
+
+	def __str__(self):
+		return self.user.__str__()
+
 class Team(db.Document):
 	name=db.StringField(max_length=80, unique=True)
 	description=db.StringField(max_length=255)
 	admin=db.ReferenceField(User, required=True)
 	date=db.DateTimeField(default=datetime.now, required=True)
-	members=db.ListField(db.ListField(db.ReferenceField(User), default=[]))
+	members=db.EmbeddedDocumentListField('Member')
 	renderfields=("name", "description", "admin", "members")
 	renderfieldsaslist=("members")
+	
+	def addmember(self, usertoadd):
+		if (usertoadd):
+			m=Member(user=usertoadd)
+			self.members.append(m)
+			self.save()
+			
+	
+	def invite(self, email):
+		u=User.objects(email=email).first()
+		if u:
+			if self.members.filter(user=u).count() == 0 :
+				self.addmember(u)
+				flash("User added", "success")
+			else:
+				flash("User allready in the team", "error")	
+		else:
+			u=User(email=email).save()
+			self.addmember(u)
+			flash("Email sent", "success")	
+	
 	
 	def __str__(self):
 		return("%s" % self.name)
@@ -53,7 +84,7 @@ class MoodItem(db.Document):
 		return("%s" % self.name)
 		
 	def __repr__(self):
-		return (self.__str__())
+		return(self.__str__())
 
 class MoodGroup(db.Document):
 	name=db.StringField(max_length=32)

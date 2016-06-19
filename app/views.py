@@ -32,8 +32,7 @@ def moodnavbar():
 @app.route("/index")
 @app.route("/")
 def index():
-	form=TeamInvite()
-	return (render_template("index.html", form=form, title="Welcome"))
+	return (render_template("index.html", title="Welcome"))
 
 
 @app.route("/mood",  methods=["GET", "POST"])
@@ -41,7 +40,7 @@ def index():
 @login_required
 def mood(mood_id=None):
 	if mood_id:
-		m=Mood.objects.get(id=mood_id)
+		m=Mood.objects.get_or_404(id=mood_id)
 	else:
 		m=Mood()
 	Moodform=model_form(Mood, only=["mood", "comment"])
@@ -49,7 +48,7 @@ def mood(mood_id=None):
 	form=Moodform(request.form, m)
 	if  form.validate_on_submit():
 		form.populate_obj(m)
-		m.user=User.objects.get(id=current_user.id)
+		m.user=User.objects.get_or_404(id=current_user.id)
 		m.save()
 		flash("Thanks a lot", "success")
 		return (redirect("/index"))
@@ -61,7 +60,7 @@ def mood(mood_id=None):
 def moodview(mood_id=None):
 	if mood_id:
 		try:
-			m=Mood.objects.get(id=mood_id)
+			m=Mood.objects.get_or_404(id=mood_id)
 		except:
 			flash("Mood not found", "error")
 			return redirect("/moodlist")
@@ -74,7 +73,7 @@ def moodview(mood_id=None):
 def deletemood(mood_id=None):
 	if mood_id:
 		try:
-			m=Mood.objects.get(id=mood_id)
+			m=Mood.objects.get_or_404(id=mood_id)
 			m.delete()
 			flash("Mood deleted", "success")
 		except:	
@@ -93,7 +92,7 @@ def moodlist():
 @app.route("/profile",  methods=["GET", "POST"])
 @login_required
 def profile():
-	user=User.objects.get(id=current_user.id)
+	user=User.objects.get_or_404(id=current_user.id)
 	Userform=model_form(User, only=["name", "teams", "description"])
 	Userform.submit=SubmitField('Go')
 	form=Userform(request.form, user)
@@ -112,10 +111,10 @@ def profile():
 @login_required
 def team(team_id=None):
 	if team_id:
-		t=Team.objects.get(id=team_id)
+		t=Team.objects.get_or_404(id=team_id)
 	else:
 		t=Team()
-	t.admin=User.objects.get(id=current_user.id)
+	t.admin=User.objects.get_or_404(id=current_user.id)
 	Teamform=model_form(Team, only=["name", "description"])
 	Teamform.submit=SubmitField('Go')
 	form=Teamform(request.form, t)
@@ -132,7 +131,7 @@ def team(team_id=None):
 def teamview(team_id=None):
 	if team_id:
 		try:
-			t=Team.objects.get(id=team_id)
+			t=Team.objects.get_or_404(id=team_id)
 			print(dir(t.members))
 		except:
 			flash("Team not found", "error")
@@ -147,7 +146,7 @@ def teamview(team_id=None):
 def deleteteam(team_id=None):
 	if team_id:
 		try:
-			t=Team.objects.get(id=team_id)
+			t=Team.objects.get_or_404(id=team_id)
 			t.delete()
 			flash("Team deleted", "success")
 		except:	
@@ -160,20 +159,10 @@ def teaminvite(team_id=None):
 	if not team_id:
 		flash("No team ", "error")
 		return (redirect("/index"))	
-	t=Team.objects.get(id=team_id)
+	t=Team.objects.get_or_404(id=team_id)
 	form=TeamInvite()
 	if  form.validate_on_submit():
-		u=User.objects(email=form.email.data).first()
-		if u:
-			if not Team.objects(members=u):
-				t.update(add_to_set__members=u)
-				flash("User added", "success")
-			else:
-				flash("User allready in the team", "error")	
-		else:
-			u=User(email=form.email.data).save()
-			t.update(add_to_set__members=u)
-			flash("Email sent", "success")
+		t.invite(form.email.data)
 		return (redirect("/index"))	
 	return  (render_template("form.html", form=form, title="Invite"))
 
@@ -192,7 +181,7 @@ def teamlist():
 def personalstats():
 	c1=PersoPieChart()
 	c2=PersoHistoChart()
-	user=User.objects.get(id=current_user.id)
+	user=User.objects.get_or_404(id=current_user.id)
 	return (render_template("stats.html", title="Personal statistics",  item=user, charts=[c1, c2]))
 	
 @app.route("/team/stats")	
