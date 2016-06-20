@@ -2,7 +2,8 @@ from app import db
 from flask_security import UserMixin, RoleMixin, current_user
 from wtforms import validators
 from datetime import datetime
-from flask import  flash
+from flask import  flash, url_for
+from collections import OrderedDict
 
 class Role(db.Document, RoleMixin):
 	name = db.StringField(max_length=80, unique=True)
@@ -23,6 +24,8 @@ class User(UserMixin, db.Document):
 	
 	renderfields= ("name", "email", "description", "teams")
 	renderfieldsaslist = ("teams")
+	badge="teams"
+	
 	def __str__(self):
 		if (self.name):
 			return("%s" % self.name)
@@ -48,11 +51,19 @@ class Team(db.Document):
 	admin=db.ReferenceField(User, required=True)
 	date=db.DateTimeField(default=datetime.now, required=True)
 	members=db.EmbeddedDocumentListField('Member')
+	photo=db.FileField()
+	
 	renderfields=("name", "description", "admin", "members")
 	renderfieldsaslist=("members")
+	actions=OrderedDict((("view", "View"), ("edit", "Edit"), ("invite", "Invite"), ("delete", "Delete")))
+	badge="members"
+	
+	@property
+	def editurl(self):
+		return url_for("team")
 	
 	def addmember(self, usertoadd):
-		if (usertoadd):
+		if usertoadd:
 			m=Member(user=usertoadd)
 			self.members.append(m)
 			self.save()
@@ -98,7 +109,14 @@ class Mood(db.Document):
 	date=db.DateTimeField(default=datetime.now, required=True)
 	user=db.ReferenceField(User, required=True)
 	comment=db.StringField(max_length=255)
+	
 	renderfields=("mood", "date", "comment")
+	actions=OrderedDict((("view", "View"), ("edit", "Edit"), ("delete", "Delete")))	
+
+	@property
+	def editurl(self):
+		return url_for("mood")
+
 	
 	def __str__(self):
 		return("%s" % self.mood.name)

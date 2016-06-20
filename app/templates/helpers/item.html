@@ -1,6 +1,6 @@
 {% from "helpers/confirm.html" import confirm as confirm %}
 
- {% macro renderitem(element, badge, editurl, long=False) %} 
+ {% macro renderitem(element, long=False) %} 
 			{% if element.renderfields %}
 				{% set fields = element.renderfields %}
 			{% else %}
@@ -9,8 +9,8 @@
 
 	<div class="list-group">
 		<dl class="list-group-item">
-			{%if badge %}
-				<span class="badge">{{ element[badge]|length }}</span>
+			{%if element.badge %}
+				<span class="badge">{{ element[element.badge]|length }}</span>
 			{% endif %}			
 
 			{% for field in fields %}
@@ -38,11 +38,15 @@
 				{% endif %}
 			{% endfor %}
 		</dl>
-			{% if editurl %}
+			{% if element.editurl %}
 				<div class="btn-group btn-group-justified" role="group">
-					<a href="{{editurl}}/view/{{ element['id'] }}" role="button" type="button" class="btn btn-primary">View</a>
-					<a href="{{editurl}}/edit/{{ element['id'] }}" role="button" type="button" class="btn btn-primary">Edit</a>
-					{{ confirm(editurl, element['id']) }}
+					{% for action in element.actions.keys() %}
+						{% if action != "delete" %}
+							<a href="{{element.editurl}}/{{action}}/{{ element['id'] }}" role="button" type="button" class="btn btn-primary">{{ element.actions[action]}}</a>
+						{% else %}
+							{{ confirm(element.editurl, element['id']) }}
+						{% endif %}
+					{%endfor %}
 				</div>
 			{% endif %}
 

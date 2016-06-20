@@ -66,7 +66,7 @@ def moodview(mood_id=None):
 			return redirect("/moodlist")
 	else:
 		return redirect("/index")
-	return (render_template("view.html", element=m, editurl=url_for("mood"), title="Mood", long=True))
+	return (render_template("view.html", element=m, title="Mood", long=True))
 
 @app.route("/mood/delete/<mood_id>")
 @login_required
@@ -84,7 +84,7 @@ def deletemood(mood_id=None):
 @login_required
 def moodlist():
 	moods=Mood.objects(user=current_user.id).order_by("-date")
-	return (render_template("list.html", list=moods,  editurl=url_for("mood"), title="Moods"))
+	return (render_template("list.html", list=moods,  title="Moods"))
 
 
 
@@ -132,13 +132,12 @@ def teamview(team_id=None):
 	if team_id:
 		try:
 			t=Team.objects.get_or_404(id=team_id)
-			print(dir(t.members))
 		except:
 			flash("Team not found", "error")
 			return redirect("/teamlist")
 	else:
 		return redirect("/index")
-	return (render_template("view.html", element=t,  editurl=url_for("team"), title="Team", long=True))
+	return (render_template("view.html", element=t,  title="Team", long=True))
 
 
 @app.route("/team/delete/<team_id>")
@@ -171,8 +170,7 @@ def teaminvite(team_id=None):
 @login_required
 def teamlist():
 	teams=Team.objects(admin=current_user.id).order_by("name")
-	return (render_template("list.html", list=teams,
-					editurl=url_for("team"), badge="members", title="Teams"))
+	return (render_template("list.html", list=teams, title="Teams"))
 
 """ Statistics"""
 
