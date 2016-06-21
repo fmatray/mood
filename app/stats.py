@@ -1,4 +1,4 @@
-from .models import User, MoodItem, MoodGroup, Mood, Team
+from .models import User, MoodItem, Mood, Team
 from flask_security import current_user
 from pygal import Pie, StackedBar
 from pygal.style import Style
@@ -6,7 +6,7 @@ from collections import OrderedDict
 import bson
 from datetime import date
 
-custom_style = Style(
+CUSTOM_STYLE = Style(
   background='transparent',
   plot_background='white',
   font_family="sans-serif",
@@ -18,7 +18,7 @@ custom_style = Style(
 
 class PersoPieChart(Pie):
 	def __init__(self):
-		Pie.__init__(self, inner_radius=0.5, style=custom_style, show_legend=False)
+		Pie.__init__(self, inner_radius=0.5, style=CUSTOM_STYLE, show_legend=False)
 		self.title="Distribution"
 		for label in MoodItem.objects.order_by("order"):
 			value = Mood.objects(user=current_user.id, mood=label).count()
@@ -28,7 +28,7 @@ class PersoPieChart(Pie):
 
 class PersoHistoChart(StackedBar):
 	def __init__(self):
-		StackedBar.__init__(self, style=custom_style, order_min=1, show_legend=False)
+		StackedBar.__init__(self, style=CUSTOM_STYLE, order_min=1, show_legend=False)
 		self.x_title=str(date.today().year)
 		self.title="Monthly history"
 		moods= OrderedDict()
