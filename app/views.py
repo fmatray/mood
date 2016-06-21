@@ -115,7 +115,7 @@ def team(team_id=None):
 	else:
 		t=Team()
 	t.admin=User.objects.get_or_404(id=current_user.id)
-	Teamform=model_form(Team, only=["name", "description"])
+	Teamform=model_form(Team, only=["name", "type", "description", "photo"])
 	Teamform.submit=SubmitField('Go')
 	form=Teamform(request.form, t)
 	if  form.validate_on_submit():
