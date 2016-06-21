@@ -182,7 +182,7 @@ def personalstats():
 	user=User.objects.get_or_404(id=current_user.id)
 	return (render_template("stats.html", title="Personal statistics",  item=user, charts=[c1, c2]))
 	
-@app.route("/team/stats")	
+@app.route("/team/stats")
 @app.route("/team/stats/<team_id>")
 @login_required
 def teamstats(team_id=None):
