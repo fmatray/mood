@@ -46,12 +46,13 @@ class Member(db.EmbeddedDocument):
 		return self.user.__str__()
 
 class Team(db.Document):
-	name=db.StringField(max_length=80, unique=True)
-	description=db.StringField(max_length=255)
-	admin=db.ReferenceField(User, required=True)
-	date=db.DateTimeField(default=datetime.now, required=True)
-	members=db.EmbeddedDocumentListField('Member')
-	photo=db.FileField()
+	name=db.StringField(verbose_name="Team name", help_text="Basically, who are you?", max_length=80, unique=True)
+	type=db.StringField(verbose_name="Type of team", help_text="This will give you differents options after.", choices=("Company", "NGO", "Simple"), required=True)
+	description=db.StringField(verbose_name="Description", help_text="What is the purpose of your team?", max_length=255)
+	admin=db.ReferenceField(verbose_name="Administrator", help_text="Who is the boss?", User, required=True)
+	date=db.DateTimeField(verbose_name="Creation date", help_text="Automatic field", default=datetime.now, required=True)
+	members=db.EmbeddedDocumentListField(verbose_name="Team's Members", help_text="Who is in?", 'Member')
+	photo=db.FileField(verbose_name="Photo", help_text="You look nice... Show it :-)")
 	
 	renderfields=("name", "description", "admin", "members")
 	renderfieldsaslist=("members")
