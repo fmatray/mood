@@ -84,3 +84,4 @@ def security_context_processor():
 
 
 from app import views
+from app import statsviews

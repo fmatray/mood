@@ -26,7 +26,7 @@ class PersoPieChart(Pie):
             value = Mood.objects(user=current_user.id, mood=label).count()
             self.add(label.__str__(),
                      [{"value": value, "color": label.color}])
-
+        print(Mood.objects(user=current_user.id, mood=label).to_json())
 
 class PersoHistoChart(StackedBar):
 

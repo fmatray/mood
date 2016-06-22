@@ -9,7 +9,7 @@ from flask_mongoengine.wtf import model_form
 from wtforms import SubmitField
 from flask.ext.security import current_user
 from .forms import TeamInvite
-import datetime
+from datetime import datetime
 
 
 @nav.navigation()
@@ -43,6 +43,9 @@ def index():
 def mood(mood_id=None):
     if mood_id:
         m = Mood.objects.get_or_404(id=mood_id)
+        if (datetime.now() - m.date).days > 2:
+            flash("Too old", "error")
+            return redirect("/mood/view/" + mood_id)
     else:
         m = Mood()
     Moodform = model_form(Mood, only=["mood", "comment"])
@@ -53,8 +56,8 @@ def mood(mood_id=None):
         m.user = User.objects.get_or_404(id=current_user.id)
         m.save()
         flash("Thanks a lot", "success")
-        return (redirect("/index"))
-    return (render_template("form.html", form=form, title="How do you feel today ?"))
+        return redirect("/mood/list")
+    return render_template("form.html", form=form, title="How do you feel today ?")
 
 
 @app.route("/mood/view/")
@@ -69,7 +72,7 @@ def moodview(mood_id=None):
             return redirect("/moodlist")
     else:
         return redirect("/index")
-    return (render_template("view.html", element=m, title="Mood", long=True))
+    return render_template("view.html", element=m, title="Mood", long=True)
 
 
 @app.route("/mood/delete/<mood_id>")
@@ -85,7 +88,7 @@ def deletemood(mood_id=None):
     return (redirect("/moodlist"))
 
 
-@app.route("/moodlist")
+@app.route("/mood/list")
 @login_required
 def moodlist():
     moods = Mood.objects(user=current_user.id).order_by("-date")
@@ -113,18 +116,20 @@ def profile():
 def team(team_id=None):
     if team_id:
         t = Team.objects.get_or_404(id=team_id)
+        fields = ["name", "description", "photo"]
     else:
         t = Team()
+        fields = ["name", "type", "description", "photo"]
     t.admin = User.objects.get_or_404(id=current_user.id)
-    Teamform = model_form(Team, only=["name", "type", "description", "photo"])
+    Teamform = model_form(Team, only=fields)
     Teamform.submit = SubmitField('Go')
     form = Teamform(request.form, t)
     if form.validate_on_submit():
         form.populate_obj(t)
         t.save()
         flash("Thanks a lot", "success")
-        return (redirect("/index"))
-    return (render_template("form.html", form=form, title="Team"))
+        return redirect("/index")
+    return render_template("form.html", form=form, title="Team")
 
 
 @app.route("/team/view/")
