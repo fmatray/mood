@@ -48,21 +48,24 @@ class Member(db.EmbeddedDocument):
         return self.user.__str__()
 
 
+TEAM_TYPE=(("Company", "Compagny"),
+						("NGO", "Non-governmental organization"), 
+						("Simple", "Simple"))
 class Team(db.Document):
-    name = db.StringField(verbose_name="Team name",
-                          help_text="Basically, who are you?", max_length=80, unique=True)
-    type = db.StringField(verbose_name="Type of team", help_text="This will give you differents options after.", choices=(
-        "Company", "NGO", "Simple"), required=True)
-    description = db.StringField(
-        verbose_name="Description", help_text="What is the purpose of your team?", max_length=255)
-    admin = db.ReferenceField(verbose_name="Administrator", help_text="Who is the boss?", User, required=True)
-    date = db.DateTimeField(verbose_name="Creation date",
-                            help_text="Automatic field", default=datetime.now, required=True)
-    members = db.EmbeddedDocumentListField(verbose_name="Team's Members", help_text="Who is in?", 'Member')
-    photo = db.FileField(verbose_name="Photo",
-                         help_text="You look nice... Show it :-)")
 
-    renderfields = ("name", "description", "admin", "members")
+
+    name = db.StringField(verbose_name="Team name", help_text="Basically, who are you?", 
+    									max_length=80, unique=True)
+    type = db.StringField(verbose_name="Type of team", help_text="This will give you differents options after.", 
+    									choices=TEAM_TYPE, required=True)
+    description = db.StringField(verbose_name="Description", help_text="What is the purpose of your team?", max_length=255)
+    admin = db.ReferenceField(User, verbose_name="Administrator", help_text="Who is the boss?", required=True)
+    date = db.DateTimeField(verbose_name="Creation date",
+                            				help_text="Automatic field", default=datetime.now, required=True)
+    members = db.EmbeddedDocumentListField( 'Member',verbose_name="Team's Members", help_text="Who is in?")
+    photo = db.FileField(verbose_name="Photo", help_text="You look nice... Show it :-)")
+
+    renderfields = ("name", "type", "description", "admin", "members")
     renderfieldsaslist = ("members")
     actions = OrderedDict((("view", "View"), ("edit", "Edit"),
                            ("invite", "Invite"), ("delete", "Delete")))
