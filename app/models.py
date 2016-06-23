@@ -15,10 +15,14 @@ class Role(db.Document, RoleMixin):
 
 
 class User(UserMixin, db.Document):
-    name = db.StringField(max_length=80)
-    email = db.EmailField(max_length=255, unique=True)
-    description = db.StringField(max_length=1024)
-    password = db.StringField(max_length=255)
+    name = db.StringField(max_length=80, 
+                          verbose_name="Name", help_text="Basically, who are you?")
+    email = db.EmailField(max_length=255, unique=True, 
+                          verbose_name="Email contact", help_text="Please, check your email")
+    description = db.StringField(max_length=1024, 
+                          verbose_name="Description", help_text="Tell us more about you")
+    password = db.StringField(max_length=255, 
+                          verbose_name="Password", help_text="Secret password")
     active = db.BooleanField(default=True)
     confirmed_at = db.DateTimeField()
     roles = db.ListField(db.ReferenceField(Role), default=[])
@@ -54,15 +58,17 @@ TEAM_TYPE=(("Company", "Compagny"),
 class Team(db.Document):
 
 
-    name = db.StringField(verbose_name="Team name", help_text="Basically, who are you?", 
-    									max_length=80, unique=True)
-    type = db.StringField(verbose_name="Type of team", help_text="This will give you differents options after.", 
-    									choices=TEAM_TYPE, required=True)
-    description = db.StringField(verbose_name="Description", help_text="What is the purpose of your team?", max_length=255)
-    admin = db.ReferenceField(User, verbose_name="Administrator", help_text="Who is the boss?", required=True)
-    date = db.DateTimeField(verbose_name="Creation date",
-                            				help_text="Automatic field", default=datetime.now, required=True)
-    members = db.EmbeddedDocumentListField( 'Member',verbose_name="Team's Members", help_text="Who is in?")
+    name = db.StringField(max_length=80, unique=True, 
+                          verbose_name="Team name", help_text="Basically, who are you?")
+    type = db.StringField(choices=TEAM_TYPE, required=True,
+    			  verbose_name="Type of team", help_text="This will give you differents options after.")
+    description = db.StringField(max_length=255, 
+                                verbose_name="Description", help_text="What is the purpose of your team?")
+    admin = db.ReferenceField(User, required=True, 
+                              verbose_name="Administrator", help_text="Who is the boss?")
+    date = db.DateTimeField(default=datetime.now, required=True,
+                            verbose_name="Creation date", help_text="Automatic field", )
+    members = db.EmbeddedDocumentListField('Member',verbose_name="Team's Members", help_text="Who is in?")
     photo = db.FileField(verbose_name="Photo", help_text="You look nice... Show it :-)")
 
     renderfields = ("name", "type", "description", "admin", "members")
@@ -120,11 +126,12 @@ class MoodGroup(db.Document):
 
 
 class Mood(db.Document):
-    mood = db.ReferenceField(MoodItem, default=[], validators=[
-                             validators.Required()])
+    mood = db.ReferenceField(MoodItem, default=[], validators=[validators.Required()], 
+                          verbose_name="How do you feel now?", help_text="This is a feeling")
     date = db.DateTimeField(default=datetime.now, required=True)
     user = db.ReferenceField(User, required=True)
-    comment = db.StringField(max_length=255)
+    comment = db.StringField(max_length=255, 
+                          verbose_name="Comment", help_text="Feel free to add some comments")
 
     renderfields = ("mood", "date", "comment")
     actions = OrderedDict(
