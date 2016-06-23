@@ -56,8 +56,6 @@ TEAM_TYPE=(("Company", "Compagny"),
 						("NGO", "Non-governmental organization"), 
 						("Simple", "Simple"))
 class Team(db.Document):
-
-
     name = db.StringField(max_length=80, unique=True, 
                           verbose_name="Team name", help_text="Basically, who are you?")
     type = db.StringField(choices=TEAM_TYPE, required=True,
@@ -69,7 +67,7 @@ class Team(db.Document):
     date = db.DateTimeField(default=datetime.now, required=True,
                             verbose_name="Creation date", help_text="Automatic field", )
     members = db.EmbeddedDocumentListField('Member',verbose_name="Team's Members", help_text="Who is in?")
-    photo = db.FileField(verbose_name="Photo", help_text="You look nice... Show it :-)")
+    photo = db.ImageField(thumbnail_size=(100, 100, True))
 
     renderfields = ("name", "type", "description", "admin", "members")
     renderfieldsaslist = ("members")
@@ -86,6 +84,7 @@ class Team(db.Document):
             m = Member(user=usertoadd)
             self.members.append(m)
             self.save()
+	
 
     def invite(self, email):
         u = User.objects(email=email).first()

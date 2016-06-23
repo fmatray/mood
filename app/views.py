@@ -6,18 +6,17 @@ from .models import User, MoodItem, MoodGroup, Mood, Team
 from .stats import PersoPieChart, PersoHistoChart
 from flask_mongoengine.wtf import model_form
 
-from wtforms import SubmitField
+from wtforms import SubmitField, FileField
 from flask.ext.security import current_user
 from .forms import TeamInvite
 from datetime import datetime
-
+from PIL import Image
 
 @nav.navigation()
 def moodnavbar():
     sg1 = Subgroup("Moods", View("Mood", "mood"), View(
         "Mood List", "moodlist"), Separator(), View("Statistics", "personalstats"))
-    sg2 = Subgroup("Teams", View("Team", "team"), View(
-        "Team List", "teamlist"), Separator(), View("Statistics", "teamstats"))
+    sg2 = Subgroup("Teams", View("Team", "team"), View("Team List", "teamlist"))
     sg3 = Subgroup("Auth", View("Login", "security.login"), View("Profile", "profile"), View("Logout", "security.logout"), View("Change password", "security.change_password"),
                    Separator(), View("Register", "security.register"))
     if (current_user.is_authenticated):
@@ -36,6 +35,8 @@ def moodnavbar():
 def index():
     return (render_template("index.html", title="Welcome"))
 
+
+""" Mood """
 
 @app.route("/mood",  methods=["GET", "POST"])
 @app.route("/mood/edit/<mood_id>",  methods=["GET", "POST"])
@@ -94,6 +95,7 @@ def moodlist():
     moods = Mood.objects(user=current_user.id).order_by("-date")
     return (render_template("list.html", list=moods,  title="Moods"))
 
+""" User """
 
 @app.route("/profile",  methods=["GET", "POST"])
 @login_required
@@ -109,6 +111,7 @@ def profile():
         return (redirect("/index"))
     return (render_template("form.html", form=form, title="profile"))
 
+""" Team """
 
 @app.route("/team",  methods=["GET", "POST"])
 @app.route("/team/edit/<team_id>",  methods=["GET", "POST"])
@@ -116,15 +119,20 @@ def profile():
 def team(team_id=None):
     if team_id:
         t = Team.objects.get_or_404(id=team_id)
-        fields = ["name", "description", "photo"]
+        fields = ["name", "description"]
     else:
         t = Team()
-        fields = ["name", "type", "description", "photo"]
+        fields = ["name", "type", "description"]
     t.admin = User.objects.get_or_404(id=current_user.id)
     Teamform = model_form(Team, only=fields)
+    Teamform.photo = FileField()
     Teamform.submit = SubmitField('Go')
     form = Teamform(request.form, t)
     if form.validate_on_submit():
+        t.photo.replace(request.files[form.photo.name], 
+                                    content_type=request.files["photo"].content_type, 
+                                    filename=request.files["photo"].filename)
+        del form.photo
         form.populate_obj(t)
         t.save()
         flash("Thanks a lot", "success")
@@ -174,14 +182,17 @@ def teaminvite(team_id=None):
     return (render_template("form.html", form=form, title="Invite"))
 
 
-@app.route("/teamlist")
+@app.route("/team/list")
 @login_required
 def teamlist():
     teams = Team.objects(admin=current_user.id).order_by("name")
     return (render_template("list.html", list=teams, title="Teams"))
 
-""" Statistics"""
 
+
+
+
+""" Statistics"""
 
 @app.route("/personnal/stats")
 @login_required
@@ -190,10 +201,3 @@ def personalstats():
     c2 = PersoHistoChart()
     user = User.objects.get_or_404(id=current_user.id)
     return (render_template("stats.html", title="Personal statistics",  item=user, charts=[c1, c2]))
-
-
-@app.route("/team/stats")
-@app.route("/team/stats/<team_id>")
-@login_required
-def teamstats(team_id=None):
-    return (render_template("stats.html", title="Team statistics",  charts=[]))
