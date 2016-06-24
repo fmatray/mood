@@ -98,6 +98,15 @@ class Team(db.Document):
             u = User(email=email).save()
             self.addmember(u)
             flash("Email sent", "success")
+    
+    @classmethod
+    def form(cls, fields=None):
+    	if fields:
+            Teamform = model_form(cls, only=fields)
+        else:
+            Teamform = model_form(cls)
+        Teamform.photo = FileField()
+        Teamform.submit = SubmitField('Go')
 
     def __str__(self):
         return("%s" % self.name)
