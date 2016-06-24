@@ -3,9 +3,10 @@ from app import app
 from .models import User, MoodItem, Mood, Team
 from bson.json_util import dumps
 
+
 @app.route("/stats/perso")
 def statspersojson():
-    result=Mood._get_collection().aggregate([{"$lookup": {"from": "mood_item", "localField": "mood", "foreignField" : "_id", "as" : "mood" } }, 
-                                                            { "$unwind" : "$mood"}, 
-                                                            { "$group": { "_id": {"name" : "$mood.name" , "color" : "$mood.color"}, "count": { "$sum": 1 } } } ])
+    result = Mood._get_collection().aggregate([{"$lookup": {"from": "mood_item", "localField": "mood", "foreignField": "_id", "as": "mood"}},
+                                               {"$unwind": "$mood"},
+                                               {"$group": {"_id": {"name": "$mood.name", "color": "$mood.color"}, "count": {"$sum": 1}}}])
     return dumps(result)

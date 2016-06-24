@@ -12,11 +12,13 @@ from .forms import TeamInvite
 from datetime import datetime
 from PIL import Image
 
+
 @nav.navigation()
 def moodnavbar():
     sg1 = Subgroup("Moods", View("Mood", "mood"), View(
         "Mood List", "moodlist"), Separator(), View("Statistics", "personalstats"))
-    sg2 = Subgroup("Teams", View("Team", "team"), View("Team List", "teamlist"))
+    sg2 = Subgroup("Teams", View("Team", "team"),
+                   View("Team List", "teamlist"))
     sg3 = Subgroup("Auth", View("Login", "security.login"), View("Profile", "profile"), View("Logout", "security.logout"), View("Change password", "security.change_password"),
                    Separator(), View("Register", "security.register"))
     if (current_user.is_authenticated):
@@ -37,6 +39,7 @@ def index():
 
 
 """ Mood """
+
 
 @app.route("/mood",  methods=["GET", "POST"])
 @app.route("/mood/edit/<mood_id>",  methods=["GET", "POST"])
@@ -97,6 +100,7 @@ def moodlist():
 
 """ User """
 
+
 @app.route("/profile",  methods=["GET", "POST"])
 @login_required
 def profile():
@@ -113,6 +117,7 @@ def profile():
 
 """ Team """
 
+
 @app.route("/team",  methods=["GET", "POST"])
 @app.route("/team/edit/<team_id>",  methods=["GET", "POST"])
 @login_required
@@ -127,9 +132,9 @@ def team(team_id=None):
     Teamform = Team.form(fields)
     form = Teamform(request.form, t)
     if form.validate_on_submit():
-        t.photo.replace(request.files[form.photo.name], 
-                                    content_type=request.files["photo"].content_type, 
-                                    filename=request.files["photo"].filename)
+        t.photo.replace(request.files[form.photo.name],
+                        content_type=request.files["photo"].content_type,
+                        filename=request.files["photo"].filename)
         del form.photo
         form.populate_obj(t)
         t.save()
@@ -187,10 +192,8 @@ def teamlist():
     return (render_template("list.html", list=teams, title="Teams"))
 
 
-
-
-
 """ Statistics"""
+
 
 @app.route("/personnal/stats")
 @login_required

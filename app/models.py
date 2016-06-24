@@ -1,5 +1,7 @@
 from app import db
 from flask_security import UserMixin, RoleMixin, current_user
+from flask_mongoengine.wtf import model_form
+from wtforms import SubmitField, FileField
 from wtforms import validators
 from datetime import datetime
 from flask import flash, url_for
@@ -15,14 +17,14 @@ class Role(db.Document, RoleMixin):
 
 
 class User(UserMixin, db.Document):
-    name = db.StringField(max_length=80, 
+    name = db.StringField(max_length=80,
                           verbose_name="Name", help_text="Basically, who are you?")
-    email = db.EmailField(max_length=255, unique=True, 
+    email = db.EmailField(max_length=255, unique=True,
                           verbose_name="Email contact", help_text="Please, check your email")
-    description = db.StringField(max_length=1024, 
-                          verbose_name="Description", help_text="Tell us more about you")
-    password = db.StringField(max_length=255, 
-                          verbose_name="Password", help_text="Secret password")
+    description = db.StringField(max_length=1024,
+                                 verbose_name="Description", help_text="Tell us more about you")
+    password = db.StringField(max_length=255,
+                              verbose_name="Password", help_text="Secret password")
     active = db.BooleanField(default=True)
     confirmed_at = db.DateTimeField()
     roles = db.ListField(db.ReferenceField(Role), default=[])
@@ -50,23 +52,26 @@ class Member(db.EmbeddedDocument):
 
     def __str__(self):
         return self.user.__str__()
+	
+
+TEAM_TYPE = (("Company", "Compagny"),
+             ("NGO", "Non-governmental organization"),
+             ("Simple", "Simple"))
 
 
-TEAM_TYPE=(("Company", "Compagny"),
-						("NGO", "Non-governmental organization"), 
-						("Simple", "Simple"))
 class Team(db.Document):
-    name = db.StringField(max_length=80, unique=True, 
+    name = db.StringField(max_length=80, unique=True,
                           verbose_name="Team name", help_text="Basically, who are you?")
     type = db.StringField(choices=TEAM_TYPE, required=True,
-    			  verbose_name="Type of team", help_text="This will give you differents options after.")
-    description = db.StringField(max_length=255, 
-                                verbose_name="Description", help_text="What is the purpose of your team?")
-    admin = db.ReferenceField(User, required=True, 
+                          verbose_name="Type of team", help_text="This will give you differents options after.")
+    description = db.StringField(max_length=255,
+                                 verbose_name="Description", help_text="What is the purpose of your team?")
+    admin = db.ReferenceField(User, required=True,
                               verbose_name="Administrator", help_text="Who is the boss?")
     date = db.DateTimeField(default=datetime.now, required=True,
                             verbose_name="Creation date", help_text="Automatic field", )
-    members = db.EmbeddedDocumentListField('Member',verbose_name="Team's Members", help_text="Who is in?")
+    members = db.EmbeddedDocumentListField(
+        'Member', verbose_name="Team's Members", help_text="Who is in?")
     photo = db.ImageField(thumbnail_size=(100, 100, True))
 
     renderfields = ("name", "type", "description", "admin", "members")
@@ -84,7 +89,16 @@ class Team(db.Document):
             m = Member(user=usertoadd)
             self.members.append(m)
             self.save()
-	
+
+    @classmethod
+    def form(cls, fields=None):
+        if fields:
+          Teamform = model_form(cls, only=fields)
+        else:
+          Teamform = model_form(cls)
+        Teamform.photo = FileField()
+        Teamform.submit = SubmitField('Go')
+        return Teamform
 
     def invite(self, email):
         u = User.objects(email=email).first()
@@ -98,15 +112,9 @@ class Team(db.Document):
             u = User(email=email).save()
             self.addmember(u)
             flash("Email sent", "success")
-    
-    @classmethod
-    def form(cls, fields=None):
-    	if fields:
-            Teamform = model_form(cls, only=fields)
-        else:
-            Teamform = model_form(cls)
-        Teamform.photo = FileField()
-        Teamform.submit = SubmitField('Go')
+        return True
+
+
 
     def __str__(self):
         return("%s" % self.name)
@@ -134,12 +142,12 @@ class MoodGroup(db.Document):
 
 
 class Mood(db.Document):
-    mood = db.ReferenceField(MoodItem, default=[], validators=[validators.Required()], 
-                          verbose_name="How do you feel now?", help_text="This is a feeling")
+    mood = db.ReferenceField(MoodItem, default=[], validators=[validators.Required()],
+                             verbose_name="How do you feel now?", help_text="This is a feeling")
     date = db.DateTimeField(default=datetime.now, required=True)
     user = db.ReferenceField(User, required=True)
-    comment = db.StringField(max_length=255, 
-                          verbose_name="Comment", help_text="Feel free to add some comments")
+    comment = db.StringField(max_length=255,
+                             verbose_name="Comment", help_text="Feel free to add some comments")
 
     renderfields = ("mood", "date", "comment")
     actions = OrderedDict(
