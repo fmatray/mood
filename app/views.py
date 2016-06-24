@@ -124,9 +124,7 @@ def team(team_id=None):
         t = Team()
         fields = ["name", "type", "description"]
     t.admin = User.objects.get_or_404(id=current_user.id)
-    Teamform = model_form(Team, only=fields)
-    Teamform.photo = FileField()
-    Teamform.submit = SubmitField('Go')
+    Teamform = Team.form(fields)
     form = Teamform(request.form, t)
     if form.validate_on_submit():
         t.photo.replace(request.files[form.photo.name], 
