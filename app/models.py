@@ -74,12 +74,16 @@ class Team(db.Document):
         'Member', verbose_name="Team's Members", help_text="Who is in?")
     photo = db.ImageField(thumbnail_size=(100, 100, True))
 
-    renderfields = ("name", "type", "description", "admin", "members")
+    renderfields = ("name", "type", "description", "admin")
     renderfieldsaslist = ("members")
     actions = OrderedDict((("view", "View"), ("edit", "Edit"),
-                           ("invite", "Invite"), ("delete", "Delete")))
+                           ("member/invite", "Invite"), ("delete", "Delete")))
     badge = "members"
 
+    @property
+    def iseditable(self):
+      return self.admin == current_user
+      
     @property
     def editurl(self):
         return url_for("team")
@@ -89,6 +93,11 @@ class Team(db.Document):
             m = Member(user=usertoadd)
             self.members.append(m)
             self.save()
+
+    def removemember(self, usertoremove):
+        m = self.members.filter(user=usertoremove)
+        m.delete()
+        m.save()
 
     @classmethod
     def form(cls, fields=None):
@@ -101,7 +110,7 @@ class Team(db.Document):
         return Teamform
 
     def invite(self, email):
-        u = User.objects(email=email).first()        
+        u = User.objects(email=email).first()
         if u:
             if self.members.filter(user=u).count() == 0:
                 self.addmember(u)

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "helpers/item.html" import renderitem as renderitem %}
+{% from "helpers/confirm.html" import confirm as confirm %}
+ 
+ {% block content %} 
+<div class="container">
+	{{ super() }}
+	<div class="row">
+  	<div class="col-md-9 fill">
+      {{ renderitem(element, long, ["description", "type"], False) }}
+    </div>
+  	<div class="col-md-3">
+      <a href="{{element.editurl}}/photo/{{ element['id'] }}"  class="thumbnail">
+     	  <img src="{{element.editurl}}/photo/{{ element['id'] }}">
+    	</a>
+    </div>
+	</div>
+	
+	<div class="row">
+	  <div class="col-md-9">
+	    STATS
+	  </div>
+		<div class="col-md-3">
+	    <div class="list-group">
+		    <dl class="list-group-item">
+			    {%if element.badge %}
+				    <span class="badge">{{ element[element.badge]|length }}</span>
+			    {% endif %}			
+			    <dt>Members</dt>
+			    <dd>
+							<ul>
+							{% for i in element["members"] %}
+	  						<li>{{ i  | capitalize }}
+  	  						{% if element.iseditable %}
+   	  							&nbsp;<a href="javascript:DeleteItem('/team/member/delete/{{element.id}}/{{ i.user.id  }}')">Delete</a>
+                 {% endif %}
+                </li>
+							{% endfor %}
+							</ul>
+						</dd>
+			  </dl>
+			</div>
+    </div>	
+	</div>
+</div>
+ {% endblock %}

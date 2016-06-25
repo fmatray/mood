@@ -13,7 +13,7 @@
 	{{ super() }}
 	<script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
 	<script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
-    <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>	
+  <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>	
 
 	<script>
 function DeleteItem(url)
@@ -28,6 +28,7 @@ function DeleteItem(url)
 
 {% block styles -%}
     {{super()}}  
+	  <link  href="{{ url_for('static', filename='css/heightcol.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block navbar %}

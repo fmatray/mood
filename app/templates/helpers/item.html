@@ -1,15 +1,17 @@
 {% from "helpers/confirm.html" import confirm as confirm %}
 
- {% macro renderitem(element, long=False) %} 
-			{% if element.renderfields %}
+ {% macro renderitem(element, long=False, customfields=False, showbadge=True) %} 
+			{% if customfields %}
+				{% set fields = customfields %}
+			{% elif element.renderfields %}
 				{% set fields = element.renderfields %}
 			{% else %}
 				{% set fields = element._fields.keys() %}
 			{% endif %}
 
-	<div class="list-group">
-		<dl class="list-group-item">
-			{%if element.badge %}
+	<div class="list-group fill">
+		<dl class="list-group-item fill">
+			{%if showbadge and element.badge %}
 				<span class="badge">{{ element[element.badge]|length }}</span>
 			{% endif %}			
 

@@ -155,15 +155,18 @@ def teamview(team_id=None):
             return redirect("/teamlist")
     else:
         return redirect("/index")
-    return (render_template("view.html", element=t,  title="Team", long=True))
+    return (render_template("viewteam.html", element=t,  title=t.name, long=True))
 
-@app.route("/team/photo/")
+
 @app.route("/team/photo/<team_id>")
-def teamphoto(team_id=None):
-    if team_id:
-    	t = Team.objects.get_or_404(id=team_id)
-    	response = make_response(t.photo.read())
-    	response.mimetype = t.photo.content_type
+@app.route("/team/photo/<team_id>/<thumbnail>")
+def teamphoto(team_id=None, thumbnail=None):
+    t = Team.objects.get_or_404(id=team_id)
+    if thumbnail:
+        response = make_response(t.photo.thumbnail.read())
+    else:
+        response = make_response(t.photo.read())
+    response.mimetype = t.photo.content_type
     return response
 
 
@@ -180,9 +183,9 @@ def deleteteam(team_id=None):
     return (redirect("/teamlist"))
 
 
-@app.route("/team/invite/<team_id>",  methods=["GET", "POST"])
+@app.route("/team/member/invite/<team_id>",  methods=["GET", "POST"])
 @login_required
-def teaminvite(team_id=None):
+def teammemberinvite(team_id=None):
     if not team_id:
         flash("No team ", "error")
         return (redirect("/index"))
@@ -190,9 +193,16 @@ def teaminvite(team_id=None):
     form = TeamInvite()
     if form.validate_on_submit():
         t.invite(form.email.data)
-        return (redirect("/index"))
-    return (render_template("form.html", form=form, title="Invite"))
+        return redirect("/index")
+    return render_template("form.html", form=form, title="Invite")
 
+@app.route("/team/member/delete/<team_id>/<user_id>")
+@login_required
+def teammemberdelete(team_id=None, user_id=None):
+	t = Team.objects.get_or_404(id=team_id)
+	u = User.objects(id=user_id).first()
+	t.removemember(u)
+	return redirect("/team/view/" + str(t.id))
 
 @app.route("/team/list")
 @login_required
