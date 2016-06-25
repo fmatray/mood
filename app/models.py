@@ -52,7 +52,7 @@ class Member(db.EmbeddedDocument):
 
     def __str__(self):
         return self.user.__str__()
-	
+
 
 TEAM_TYPE = (("Company", "Compagny"),
              ("NGO", "Non-governmental organization"),
@@ -93,15 +93,15 @@ class Team(db.Document):
     @classmethod
     def form(cls, fields=None):
         if fields:
-          Teamform = model_form(cls, only=fields)
+            Teamform = model_form(cls, only=fields)
         else:
-          Teamform = model_form(cls)
-        Teamform.photo = FileField()
-        Teamform.submit = SubmitField('Go')
+            Teamform = model_form(cls)
+            Teamform.photo = FileField()
+            Teamform.submit = SubmitField('Go')
         return Teamform
 
     def invite(self, email):
-        u = User.objects(email=email).first()
+        u = User.objects(email=email).first()        
         if u:
             if self.members.filter(user=u).count() == 0:
                 self.addmember(u)
@@ -113,8 +113,6 @@ class Team(db.Document):
             self.addmember(u)
             flash("Email sent", "success")
         return True
-
-
 
     def __str__(self):
         return("%s" % self.name)

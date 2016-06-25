@@ -1,4 +1,4 @@
-from flask import render_template, flash, request, redirect, session, url_for
+from flask import render_template, flash, request, redirect, session, url_for, make_response
 from flask_nav.elements import Navbar, View, Subgroup, Text, Separator
 from app import app, nav
 from flask_security import login_required
@@ -156,6 +156,15 @@ def teamview(team_id=None):
     else:
         return redirect("/index")
     return (render_template("view.html", element=t,  title="Team", long=True))
+
+@app.route("/team/photo/")
+@app.route("/team/photo/<team_id>")
+def teamphoto(team_id=None):
+    if team_id:
+    	t = Team.objects.get_or_404(id=team_id)
+    	response = make_response(t.photo.read())
+    	response.mimetype = t.photo.content_type
+    return response
 
 
 @app.route("/team/delete/<team_id>")
