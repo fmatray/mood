@@ -47,7 +47,7 @@ def index():
 def mood(mood_id=None):
     if mood_id:
         m = Mood.objects.get_or_404(id=mood_id)
-        if (datetime.now() - m.date).days > 2:
+        if not m.iseditable:
             flash("Too old", "error")
             return redirect("/mood/view/" + mood_id)
     else:

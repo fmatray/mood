@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% from "helpers/item.html" import renderitem as renderitem %}
 {% from "helpers/confirm.html" import confirm as confirm %}
- 
- {% block content %} 
+  
+{% block content %} 
+{{ super() }}
 <div class="container">
-	{{ super() }}
 	<div class="row">
   	<div class="col-md-9 fill">
       {{ renderitem(element, long, ["description", "type"], False) }}
     </div>
   	<div class="col-md-3">
-      <a href="{{element.editurl}}/photo/{{ element['id'] }}"  class="thumbnail">
-     	  <img src="{{element.editurl}}/photo/{{ element['id'] }}">
+      <a href="{{element.editurl}}/photo/{{ element['id'] }}" class="thumbnail"  data-toggle="tooltip" title="You look nice">
+     	  <img src="{{element.editurl}}/photo/{{ element['id'] }}" class="img-responsive">
     	</a>
     </div>
 	</div>
@@ -38,9 +38,12 @@
 							{% endfor %}
 							</ul>
 						</dd>
+              <a href="{{element.editurl}}/member/invite/{{ element['id'] }}" class="btn btn-default btn-xs" aria-label="Invite">
+                <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+              </a>     
 			  </dl>
 			</div>
     </div>	
 	</div>
 </div>
- {% endblock %}
+{% endblock %}

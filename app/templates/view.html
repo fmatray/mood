@@ -2,16 +2,11 @@
 {% from "helpers/item.html" import renderitem as renderitem %}
  
  {% block content %} 
+ {{ super() }}
 <div class="container">
-	{{ super() }}
 	<div class="row">
 		<div class="col-md-6">
 			{{ renderitem(element, long) }}
-		</div>
-		<div class="col-md-6  col-md-2">
-			<p  class="thumbnail">
-				<img src="{{element.editurl}}/photo/{{ element['id'] }}">
-			</p>
 		</div>
 	</div>
 </div>

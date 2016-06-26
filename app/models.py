@@ -161,6 +161,10 @@ class Mood(db.Document):
         (("view", "View"), ("edit", "Edit"), ("delete", "Delete")))
 
     @property
+    def iseditable(self):
+      return (datetime.now() - self.date).days < 2
+
+    @property
     def editurl(self):
         return url_for("mood")
 

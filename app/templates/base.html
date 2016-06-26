@@ -4,52 +4,65 @@
 {% import "bootstrap/utils.html" as utils %}
 {% block title %} How do you feel today ? {% endblock %} 
 
-{% block head %}
+{%- block head %}
 	{{super()}}
 	{{fixes.ie8()}}
 {%- endblock %}
 
-{% block scripts %}
-	{{ super() }}
-	<script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
-	<script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
-  <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>	
+{%- block scripts %}
+  	<script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
+  	<script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
+    <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>	
 
-	<script>
-function DeleteItem(url)
-    {
-        bootbox.confirm("You can't undo this action. Are you sure?", function(result){
-            if(result)
-            { window.location.href = url }
-        });
-    }
-</script>
+	  <script>
+      function DeleteItem(url)
+        {
+            bootbox.confirm("You can't undo this action. Are you sure?", function(result){
+                if(result)
+                { window.location.href = url }
+            });
+        }
+    </script>
 {% endblock %}
+
+
 
 {% block styles -%}
     {{super()}}  
 	  <link  href="{{ url_for('static', filename='css/heightcol.css') }}" rel="stylesheet">
 {% endblock %}
 
+
 {% block navbar %}
 	{{nav.moodnavbar.render()}}
 {% endblock %}
 
-{% block content %}
+
+{%- block content %}
   {%- with messages = get_flashed_messages(with_categories=True) %}
-  {%- if messages %}
-    <div class="row">
-      <div class="col-md-12">
-        {{utils.flashed_messages(messages)}}
-      </div>
-    </div>
+    {%- if messages %}
+     <div class="row">
+       <div class="col-md-12">
+         {{utils.flashed_messages(messages)}}
+       </div>
+     </div>
   {%- endif %}
   {%- endwith %}
   {% if title %}
-  <div class="row">
-		<div class="col-md-12">
-			<h1>{{ title }}<h1>
+  <div class="container">
+		<div  class="page-header">
+			<h1>{{ title | capitalize }}<h1>
 		</div>
 	</div>
 	{% endif %}
- {% endblock %}
+
+{% endblock %}
+
+{% block footer %}
+  <footer class="footer">
+     <div class="container">
+       <p class="text-muted">Place sticky footer content here.</p>
+     </div>
+   </footer>
+{% endblock %}
+ 
