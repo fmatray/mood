@@ -1,4 +1,4 @@
-from flask import render_template, flash, request, redirect, session, url_for, make_response
+from flask import render_template, flash, request, redirect, session, url_for
 from flask_nav.elements import Navbar, View, Subgroup, Text, Separator
 from app import app, nav
 from flask_security import login_required
@@ -158,6 +158,7 @@ def teamview(team_id=None):
     return (render_template("viewteam.html", element=t,  title=t.name, long=True))
 
 
+<<<<<<< HEAD
 @app.route("/team/photo/<team_id>")
 @app.route("/team/photo/<team_id>/<thumbnail>")
 def teamphoto(team_id=None, thumbnail=None):
@@ -169,6 +170,8 @@ def teamphoto(team_id=None, thumbnail=None):
     response.mimetype = t.photo.content_type
     return response
 
+=======
+>>>>>>> parent of b1103b0... add image for teams
 
 @app.route("/team/delete/<team_id>")
 @login_required
