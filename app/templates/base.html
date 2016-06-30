@@ -9,6 +9,13 @@
 	{{fixes.ie8()}}
 {%- endblock %}
 
+{% block styles -%}
+    {{super()}}  
+	  <ink  href="{{ url_for('static', filename='css/heightcol.css') }}" rel="stylesheet">
+	  <link  href="{{ url_for('static', filename='css/footer.css') }}" rel="stylesheet">
+
+{% endblock %}
+
 {%- block scripts %}
   	<script src="{{ url_for('static', filename='js/bootbox.min.js') }}"></script>
   	<script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
@@ -23,13 +30,6 @@
             });
         }
     </script>
-{% endblock %}
-
-
-
-{% block styles -%}
-    {{super()}}  
-	  <link  href="{{ url_for('static', filename='css/heightcol.css') }}" rel="stylesheet">
 {% endblock %}
 
 
